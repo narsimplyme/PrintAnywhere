@@ -1,14 +1,30 @@
 package com.capstone.dto;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+@JsonAutoDetect(fieldVisibility=Visibility.NONE,
+getterVisibility = Visibility.NONE,
+setterVisibility = Visibility.NONE)
+@JsonPropertyOrder({"userId", "userPw", "userName", "userMail", "userNickname", "userPhoneNumber", "userPoint"})
+@JsonIgnoreProperties({"userNewPw"})
 public class User {
-	
-	String userId;
-	String userPw;
-	String userName;
-	String userMail;
-	String userNickname;
-	String userPhoneNumber;
-	String userPoint;
+	@JsonProperty("userId")
+	private String userId;
+	@JsonProperty("userPw")
+	private String userPw;
+	@JsonProperty("userName")
+	private String userName;
+	@JsonProperty("userMail")
+	private String userMail;
+	@JsonProperty("userNickname")
+	private String userNickname;
+	@JsonProperty("userPhoneNumber")
+	private String userPhoneNumber;
+	@JsonProperty("userPoint")
+	private String userPoint;
 	
 	public User() {
 		super();

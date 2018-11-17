@@ -39,14 +39,18 @@ public class FileController {
 	@RequestMapping(value = "fileList.do",  method = RequestMethod.GET)
 	@ResponseBody
 	public Response fileList(int sizeOfList, HttpServletRequest request) {
+		Response res = new Response();
 		String token = request.getHeader("x-access-token");
 		boolean authResult = userService.isAuth(token);
-		
-		ArrayList<File> fileArray = new ArrayList<>();
-		String userId = "";
-		fileArray = fileService.selectFileList(userId , sizeOfList);
-		Response res = new Response();
-		res.setFileArray(fileArray);
+		if(authResult) {
+			res.setSuccess(true);
+			ArrayList<File> fileArray = new ArrayList<>();
+			String userId = "userId값 구하자";
+			fileArray = fileService.selectFileList(userId , sizeOfList);
+			res.setFileArray(fileArray);	
+		}else {
+			res.setSuccess(false);
+		}
 		return res;
 	}
 	

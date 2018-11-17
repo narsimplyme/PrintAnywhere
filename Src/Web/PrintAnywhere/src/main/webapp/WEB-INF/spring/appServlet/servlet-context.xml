@@ -3,9 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+	<task:annotation-driven />
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
@@ -27,22 +31,22 @@
         <beans:property name="defaultEncoding" value="utf-8"/>
 	</beans:bean>
 	<context:component-scan base-package="com.capstone" />
-<!-- 	<beans:bean id="factoryDao" class="com.capstone.model.FactoryDao" factory-method="getInstance" scope="singleton">
+	<beans:bean id="factoryDao" class="com.capstone.model.FactoryDao" factory-method="getInstance" scope="singleton">
 			<beans:constructor-arg>
 				<beans:map>
-					<beans:entry key="driver" value="com.mysql.jdbc.Driver"/>
+					<beans:entry key="driver" value="org.mariadb.jdbc.Driver"/>
 					<beans:entry key="url">
-						<beans:value>jdbc:mysql://localhost:3306/book_ex?autoReconnect=true&amp;useSSL=false</beans:value>
+						<beans:value>jdbc:mysql://xdkyu02.cafe24.com:3306/xdkyu02</beans:value>
 					</beans:entry>
 					<beans:entry key="username">
-						<beans:value>root</beans:value>
+						<beans:value>xdkyu02</beans:value>
 					</beans:entry>
 					<beans:entry key="password">
-						<beans:value>951753</beans:value>
+						<beans:value>a60122467</beans:value>
 					</beans:entry>
 				</beans:map>
 			</beans:constructor-arg>
-	</beans:bean> -->  
+	</beans:bean>  
 	
 	
 </beans:beans>

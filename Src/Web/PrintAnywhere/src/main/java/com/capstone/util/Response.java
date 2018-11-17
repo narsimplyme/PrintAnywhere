@@ -10,7 +10,7 @@ public class Response {
 	String message = "";
 	String errors = "";
 	String token = "";
-	Object data = new Object();
+	Object data = null;
 	ArrayList<File> fileArray = new ArrayList<>();
 	
 	public Response() {

@@ -25,12 +25,16 @@ public class UserService {
 			return false;
 	}
 
-	public int insertUser(User user) {
-		return 0;
+	public boolean insertUser(User user) {
+		int resCode = userDao.insertUser(user);
+		if(resCode == Constants.DB_RES_CODE_1)
+			return true;
+		else
+			return false;
 	}
 
-	public User selectUser(String token) {
-		return null;
+	public User selectUser(String userId) {
+		return userDao.selectUser(userId);
 	}
 
 	public boolean signIn(String userId, String userPw) {
@@ -39,6 +43,11 @@ public class UserService {
 			return true;
 		else
 			return false;
+	}
+
+	public User selectUserToToken(String token) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
