@@ -69,7 +69,32 @@
 		    <artifactId>mariadb-java-client</artifactId>
 		    <version>2.2.5</version>
 		</dependency>
+		<!-- MyBatis core -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+		    <artifactId>mybatis</artifactId>
+		    <version>3.2.2</version>
+		</dependency>
+		<!-- MyBatis spring 지원 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+		   	<artifactId>mybatis-spring</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
+		<!-- 커넥션 풀을 위한 dpcp -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-dbcp2</artifactId>
+		    <version>2.0.1</version>
+		</dependency>
+		<!-- spring jdbc -->
 		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>

@@ -4,7 +4,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +21,12 @@ import com.capstone.util.Constants;
 
 @Repository
 public class UserDao {
+	
+	@Autowired
+	private DataSource dataSource;
+	
+	@Autowired
+	private SqlSession sqlSession;
 	
 	private FactoryDao factoryDao;
 	
@@ -26,60 +40,26 @@ public class UserDao {
 	}
 
 	public int signIn(String userId, String userPw) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql="SELECT * FROM user where user_id = ? and user_pw = ?";
 		try {
-			con=factoryDao.getConnection();
-			pstmt=con.prepareStatement(sql);
-			pstmt.setString(1,userId);
-			pstmt.setString(2,userPw);
-			rs = pstmt.executeQuery();
-			while(rs.next()) {
+			String result = sqlSession.selectOne("user.signIn", userId);
+			if(userPw.equals(result)) {
 				return Constants.DB_RES_CODE_3;
 			}
-		} catch (SQLException e) {
+		} catch (PersistenceException e) {
 			return Constants.DB_RES_CODE_9;
-		}finally {
-			try {
-				factoryDao.close(con, pstmt, rs);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return Constants.DB_RES_CODE_4;
 	}
 
 	public int insertUser(User user) {
-		Connection con =null;
-		PreparedStatement pstmt =null;
-		String sql=" insert into user (user_id, user_pw, user_name, user_mail, user_nickname, user_phoneNumber) "
-				+ "values (?,?,?,?,?,?)";
-		try {
-			con=factoryDao.getConnection();
-			pstmt=con.prepareStatement(sql);
-			pstmt.setString(1, user.getUserId());
-			pstmt.setString(2, user.getUserPw());
-			pstmt.setString(3, user.getUserName());
-			pstmt.setString(4, user.getUserMail());
-			pstmt.setString(5, user.getUserNickname());
-			pstmt.setString(6, user.getUserPhoneNumber());
 
-			if(pstmt.executeUpdate() != 0) {
+		try {
+			int count = sqlSession.insert("user.insertUser", user);
+			if(count > 0) {
 				return Constants.DB_RES_CODE_1;
 			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (PersistenceException e) {
 			return Constants.DB_RES_CODE_9;
-
-		}finally {
-			try {
-				factoryDao.close(con, pstmt, null);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return Constants.DB_RES_CODE_2;
 	}
@@ -90,7 +70,7 @@ public class UserDao {
 		ResultSet rs = null;
 		String sql="select * from user where user_id = ?";
 		try {
-			con=factoryDao.getConnection();
+			con = dataSource.getConnection();
 			pstmt=con.prepareStatement(sql);
 			pstmt.setString(1,userId);
 			rs = pstmt.executeQuery();

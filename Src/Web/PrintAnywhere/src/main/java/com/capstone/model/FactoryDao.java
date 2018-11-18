@@ -39,24 +39,8 @@ public class FactoryDao {
 		}
 		//conn = DriverManager.getConnection(url, username, password);
 	}
-	
-	/**
-	 * DB와 연결을 하는 메소드
-	 * @return
-	 * @throws SQLException
-	 */
-	public Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(url, username, password); 
-	}
-	
-	/**
-	 * 정적으로 DB와 연결하는 커넥션 객체를 반환하는 메소드
-	 * @return
-	 */
-	public Connection getStaticConnection() {
-		return conn;
-	}
-	
+
+
 	public void reStartConnection() throws SQLException {
 		conn = DriverManager.getConnection(url, username, password);
 	}

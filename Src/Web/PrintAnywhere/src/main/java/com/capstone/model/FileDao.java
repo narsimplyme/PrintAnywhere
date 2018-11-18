@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +17,10 @@ import com.capstone.dto.User;
 @Repository
 public class FileDao {
 	
+	@Autowired
+	private DataSource dataSource;
+	//DataSource 객체는 데이터베이스의 모든 리소스를 지칭하는 포괄적인 개념으로 JDBC 2.0 표준의 확장 API로 처음 소개되었다.
+	//여기서 설명하는 DataSource는 하나의 데이터베이스에 대응된다.
 	private FactoryDao factoryDao;
 	
 	@Autowired
@@ -29,7 +35,7 @@ public class FileDao {
 		ArrayList<File> fileArray = new ArrayList<File>();
 		String sql="select * from user where file = ?";
 		try {
-			con=factoryDao.getConnection();
+			con = dataSource.getConnection();
 			pstmt=con.prepareStatement(sql);
 			pstmt.setString(1,userId);
 			rs = pstmt.executeQuery();

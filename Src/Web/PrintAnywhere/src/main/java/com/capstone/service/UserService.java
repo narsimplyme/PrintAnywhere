@@ -38,6 +38,8 @@ public class UserService {
 	}
 
 	public boolean signIn(String userId, String userPw) {
+		if(userPw == null)
+			return false;
 		int resCode = userDao.signIn(userId, userPw);
 		if(resCode == Constants.DB_RES_CODE_3)
 			return true;
