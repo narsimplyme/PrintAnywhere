@@ -1,6 +1,7 @@
 package com.capstone.printanywhere;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -73,8 +74,8 @@ public class FileController {
 			}
 		}else {
 			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_5);
-			res.setMessage(Constants.MSG_CODE_107);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -88,37 +89,43 @@ public class FileController {
 		if(authResult != null) {
 			//인증 성공했을경우 파일 삭제
 		}else {
-			res.setErrors("잘못된 접근입니다.");
+			res.setSuccess(false);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
 	
 	@RequestMapping(value = "fileUpload.do",  method = RequestMethod.POST)
 	@ResponseBody
-	public Response fileUpload(HttpSession session, MultipartHttpServletRequest request,
-	        MultipartFile uploadFile) {
-		if(uploadFile == null) {
-			System.out.println("??");
+	public Response fileUpload(HttpSession session, MultipartHttpServletRequest request) {
+		List<MultipartFile> fileList = request.getFiles("uploadFile");
+		if(fileList.size() == 0) {
+			res.setSuccess(false);
+			res.setMessage(Constants.MSG_CODE_306);
 			//null일 경우 처리
 		}else {
 			res = new Response();
 			String tokenId = request.getHeader("x-access-token");
-			Token authResult = userService.isAuth(tokenId);
 			if(true) {
-			//if(authResult != null) {
-				UploadFile uf = new UploadFile();
-				File file = uf.uploadFile(session, request, uploadFile);
-				if(file == null) {
-					res.setSuccess(false);
-				}else {
-					res.setSuccess(true);
-					//file.setUserId(authResult.getUserId());
-					//int resCode = fileService.insertFile(file);
-				}
-				
+			/*Token authResult = userService.isAuth(tokenId);
+			if(authResult != null) {*/
+				for (int i = 0; i < fileList.size(); i++) {
+					UploadFile uf = new UploadFile();
+					File file = uf.uploadFile(session, request, fileList.get(i));
+					if(file == null) {
+						res.setSuccess(false);
+					}else {
+						res.setSuccess(true);
+						//file.setUserId(authResult.getUserId());
+						//int resCode = fileService.insertFile(file);
+					}	
+				}				
 			}else {
 				//인증이 안됐을 경우
-				
+				res.setSuccess(false);
+				res.setErrors(Constants.ERROR_CODE_7);
+				res.setMessage(Constants.MSG_CODE_110);
 			}
 		}
 		return res;

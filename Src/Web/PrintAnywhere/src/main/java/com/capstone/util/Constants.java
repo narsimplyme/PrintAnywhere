@@ -30,7 +30,9 @@ public class Constants {
 	public final static String MSG_CODE_304 = "NO_UPDATE";
 	/**DELETE후 변경된 값이 없음*/
 	public final static String MSG_CODE_305 = "NO_DELETE";
-	
+	/**NO FILE*/
+	public final static String MSG_CODE_306 = "NO_FILE";
+
 	
 	/**INSERT ERROR*/
 	public final static String ERROR_CODE_1 = "ERROR_CODE_1";

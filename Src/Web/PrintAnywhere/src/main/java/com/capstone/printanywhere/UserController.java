@@ -112,10 +112,9 @@ public class UserController {
 			}
 			
 		}else {
-			//인증 실패
-			res.setErrors(Constants.ERROR_CODE_5);
-			res.setMessage(Constants.MSG_CODE_107);
 			res.setSuccess(false);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -158,8 +157,8 @@ public class UserController {
 			
 		}else {
 			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_5);
-			res.setMessage(Constants.MSG_CODE_107);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -188,10 +187,9 @@ public class UserController {
 				data.put("ttl", authResult.getTtl());
 			}
 		}else {
-			//토큰없음
 			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_5);
-			res.setMessage(Constants.MSG_CODE_107);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -212,8 +210,8 @@ public class UserController {
 			data.put("token", newToken);
 		} else {
 			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_5);
-			res.setMessage(Constants.MSG_CODE_107);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
