@@ -107,9 +107,8 @@ public class FileController {
 		}else {
 			res = new Response();
 			String tokenId = request.getHeader("x-access-token");
-			if(true) {
-			/*Token authResult = userService.isAuth(tokenId);
-			if(authResult != null) {*/
+			Token authResult = userService.isAuth(tokenId);
+			if(authResult != null) {
 				for (int i = 0; i < fileList.size(); i++) {
 					UploadFile uf = new UploadFile();
 					File file = uf.uploadFile(session, request, fileList.get(i));
@@ -117,8 +116,8 @@ public class FileController {
 						res.setSuccess(false);
 					}else {
 						res.setSuccess(true);
-						//file.setUserId(authResult.getUserId());
-						//int resCode = fileService.insertFile(file);
+						file.setUserId(authResult.getUserId());
+						int resCode = fileService.insertFile(file);
 					}	
 				}				
 			}else {
@@ -130,6 +129,7 @@ public class FileController {
 		}
 		return res;
 	}
+		
 	
 	@RequestMapping(value = "fileDownload.do",  method = RequestMethod.GET)
 	@ResponseBody
@@ -148,6 +148,50 @@ public class FileController {
         String uploadPath = request.getSession().getServletContext().getRealPath("/");
         String attachPath = "resources/file/";  
         return uploadPath + attachPath;
+	}
+	
+	
+	
+	
+	
+	
+	
+	// 테스트
+	
+	@RequestMapping(value = "fileUploadTest.do",  method = RequestMethod.POST)
+	@ResponseBody
+	public Response fileUploadTest(HttpSession session, MultipartHttpServletRequest request) {
+		List<MultipartFile> fileList = request.getFiles("uploadFile");
+		if(fileList.size() == 0) {
+			res.setSuccess(false);
+			res.setMessage(Constants.MSG_CODE_306);
+			//null일 경우 처리
+		}else {
+			res = new Response();
+			String tokenId = request.getHeader("x-access-token");
+			if(true) {
+			/*Token authResult = userService.isAuth(tokenId);
+			if(authResult != null) {*/
+				for (int i = 0; i < fileList.size(); i++) {
+					UploadFile uf = new UploadFile();
+					File file = uf.uploadFile(session, request, fileList.get(i));
+					if(file == null) {
+						res.setSuccess(false);
+						res.setMessage(Constants.MSG_CODE_306);
+					}else {
+						res.setSuccess(true);
+						//file.setUserId(authResult.getUserId());
+						//int resCode = fileService.insertFile(file);
+					}	
+				}				
+			}else {
+				//인증이 안됐을 경우
+				res.setSuccess(false);
+				res.setErrors(Constants.ERROR_CODE_7);
+				res.setMessage(Constants.MSG_CODE_110);
+			}
+		}
+		return res;
 	}
 
 }
