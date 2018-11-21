@@ -22,9 +22,8 @@ public class FileService {
 		return fileDao.selectFileList(userId, sizeOfList);
 	}
 
-	public void insertFile(File file) {
-		// TODO Auto-generated method stub
-		
+	public int insertFile(File file) {
+		return fileDao.insertFile(file);
 	}
 
 }

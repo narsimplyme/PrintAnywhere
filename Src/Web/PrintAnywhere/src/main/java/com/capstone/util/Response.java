@@ -2,6 +2,8 @@ package com.capstone.util;
 
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+
 import com.capstone.dto.File;
 
 public class Response {
@@ -9,8 +11,7 @@ public class Response {
 	boolean success = true;
 	String message = "";
 	String errors = "";
-	String token = "";
-	Object data = null;
+	JSONObject data = new JSONObject();
 	ArrayList<File> fileArray = new ArrayList<>();
 	
 	public Response() {
@@ -35,21 +36,15 @@ public class Response {
 	public void setErrors(String errors) {
 		this.errors = errors;
 	}
-	public String getToken() {
-		return token;
-	}
 
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public Object getData() {
+	public JSONObject getData() {
 		return data;
 	}
-	
-	public void setData(Object data) {
+
+	public void setData(JSONObject data) {
 		this.data = data;
 	}
+
 	public ArrayList<File> getFileArray() {
 		return fileArray;
 	}
@@ -68,7 +63,6 @@ public class Response {
 		builder.append(", errors=");
 		builder.append(errors);
 		builder.append(", data=");
-		builder.append(token);
 		builder.append("]");
 		return builder.toString();
 	}

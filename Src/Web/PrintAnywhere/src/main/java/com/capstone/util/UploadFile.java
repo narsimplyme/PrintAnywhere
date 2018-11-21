@@ -21,20 +21,23 @@ public class UploadFile {
 		String path = "";
         String fileName = "";
         String fileOriginName = uploadFile.getOriginalFilename();
+        int expender = fileOriginName.lastIndexOf(".");
         OutputStream out = null;
         PrintWriter printWriter = null;
+        String hashFileName = AuthToken.getToken(fileOriginName)+fileOriginName.substring(expender, fileOriginName.length());
         System.out.println("fileOriginName: "+fileOriginName+" / "
         +"getContentType: "+uploadFile.getContentType()
-        +" / "+"getSize: "+uploadFile.getSize());
+        +" / "+"getSize: "+uploadFile.getSize()+"hashFileName: "+hashFileName+"??"+expender);
         fileName = "";
         try {
-            String filePath = "";
-			//File file = new File(filePath);  
-            //out = new FileOutputStream(file);  
-            //byte[] bytes = uploadFile.getBytes();
-            //out.write(bytes);
+            String filePath = getSaveLocation(request)+hashFileName;
+			File file = new File(filePath);  
+            out = new FileOutputStream(file);  
+            byte[] bytes = uploadFile.getBytes();
+            out.write(bytes);
         }catch (Exception e) {
                 e.printStackTrace();
+                return null;
         } finally {
             try {
                 if (out != null) {
@@ -50,8 +53,13 @@ public class UploadFile {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         //(int fileId, String fileHash, String fileName, String fileType, String fileDate, String fileSize, String userId)
-        f = new com.capstone.dto.File(0, AuthToken.getToken(fileOriginName), fileOriginName, uploadFile.getContentType(), 
-        		dateFormat.format(date), ""+uploadFile.getSize(), "");
+        f = new com.capstone.dto.File(0, hashFileName, fileOriginName, 0, dateFormat.format(date), ""+uploadFile.getSize(), "");
 		return f;
+	}
+	
+	private String getSaveLocation(MultipartHttpServletRequest request) {
+        String uploadPath = request.getSession().getServletContext().getRealPath("/");
+        String attachPath = "resources/file/";        
+        return uploadPath + attachPath;
 	}
 }

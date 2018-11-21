@@ -1,8 +1,13 @@
 package com.capstone.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.capstone.dto.Token;
 import com.capstone.dto.User;
 import com.capstone.model.UserDao;
 import com.capstone.util.Constants;
@@ -17,12 +22,8 @@ public class UserService {
 		this.userDao = userDao;
 	}
 
-	public boolean isAuth(String token) {
-		int resCode = userDao.selectToken(token);
-		if(resCode == Constants.DB_RES_CODE_3)
-			return true;
-		else
-			return false;
+	public Token isAuth(String tokenId) {
+		return userDao.selectToken(tokenId);		
 	}
 
 	public boolean insertUser(User user) {
@@ -49,7 +50,24 @@ public class UserService {
 
 	public User selectUserToToken(String token) {
 		// TODO Auto-generated method stub
-		return null;
+		return new User("test1", "test2", "test3", "test4", "test5", "tes6", "tes7");
+	}
+
+	public int updateUser(User user, String userNewPw) {
+		return userDao.updateUser(user,userNewPw);
+	}
+
+	public void updateToken(String newToken, String tokenId) {
+		userDao.updateToken(newToken, tokenId);
+	}
+
+	public void insertToken(String tokenId, String userId) {
+		Date date = new Date();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+
+		Token token = new Token(tokenId, f.format(date), userId);
+
+		userDao.insertToken(token);
 	}
 
 }

@@ -5,7 +5,7 @@ public class File {
 	int fileId;
 	String fileHash;
 	String fileName;
-	String fileType;
+	int fileType = 0;
 	String fileDate;
 	String fileSize;
 	String userId;
@@ -14,7 +14,7 @@ public class File {
 		super();
 	}
 	
-	public File(int fileId, String fileHash, String fileName, String fileType, String fileDate, String fileSize, String userId) {
+	public File(int fileId, String fileHash, String fileName, int fileType, String fileDate, String fileSize, String userId) {
 		super();
 		this.fileId = fileId;
 		this.fileHash = fileHash;
@@ -43,10 +43,10 @@ public class File {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public String getFileType() {
+	public int getFileType() {
 		return fileType;
 	}
-	public void setFileType(String fileType) {
+	public void setFileType(int fileType) {
 		this.fileType = fileType;
 	}
 	public String getFileDate() {

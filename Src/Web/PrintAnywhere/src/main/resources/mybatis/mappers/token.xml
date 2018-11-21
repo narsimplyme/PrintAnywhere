@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="token">
+	<resultMap id="tokenResult" type="token">
+		<result property="tokenId" column="token_id"/>
+		<result property="ttl" column="ttl"/>
+		<result property="userId" column="user_id"/>
+	</resultMap>
+	<insert id="insertToken" parameterType="token">
+		<![CDATA[
+			insert into user (token_id, user_id, ttl) 
+			values (#{tokenId},#{userId}, #{ttl})
+		]]>
+	</insert>
+	<select id="selectToken" parameterType="string" resultMap="tokenResult">
+		<![CDATA[
+			select * from token where token_id = #{tokenId}
+		]]>
+	</select>
+	<update id="updateToken" parameterType="hashmap">
+		<![CDATA[
+			UPDATE token SET token_id = #{newToken} WHERE (token_id = #{tokenId});
+		]]>
+	</update>
+</mapper>

@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -16,6 +19,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.capstone.dto.Token;
 import com.capstone.dto.User;
 import com.capstone.util.Constants;
 
@@ -25,18 +29,19 @@ public class UserDao {
 	@Autowired
 	private DataSource dataSource;
 	
-	@Autowired
 	private SqlSession sqlSession;
 	
-	private FactoryDao factoryDao;
-	
 	@Autowired
-	public void setFactoryDao(FactoryDao factoryDao) {
-		this.factoryDao = factoryDao;
+	public void setSqlSession(SqlSession sqlSession) {
+		this.sqlSession = sqlSession;
 	}
 
-	public int selectToken(String token) {
-		return 3;
+	public Token selectToken(String tokenId) {
+		try {
+			return sqlSession.selectOne("token.selectToken", tokenId);
+		} catch (PersistenceException e) {
+			return null;
+		}
 	}
 
 	public int signIn(String userId, String userPw) {
@@ -52,7 +57,6 @@ public class UserDao {
 	}
 
 	public int insertUser(User user) {
-
 		try {
 			int count = sqlSession.insert("user.insertUser", user);
 			if(count > 0) {
@@ -65,29 +69,52 @@ public class UserDao {
 	}
 
 	public User selectUser(String userId) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql="select * from user where user_id = ?";
 		try {
-			con = dataSource.getConnection();
-			pstmt=con.prepareStatement(sql);
-			pstmt.setString(1,userId);
-			rs = pstmt.executeQuery();
-			while(rs.next()) {
-				return new User(rs.getString("user_id"), " ",
-						rs.getString("user_name"), rs.getString("user_mail"), 
-						rs.getString("user_nickname"), rs.getString("user_phoneNumber"), rs.getString("user_point"));
-			}
-		} catch (SQLException e) {
+			return (User)sqlSession.selectOne("user.selectUser", userId);
+		} catch (PersistenceException e) {
 			return null;
-		}finally {
-			try {
-				factoryDao.close(con, pstmt, rs);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-		return null;
+	}
+
+	public int updateUser(User user, String userNewPw) {
+		try {
+			int count = sqlSession.update("user.updateUser", user);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_5;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_6;
+	}
+
+	public int updateToken(String newToken, String tokenId) {
+		try {
+			Map<String, String> tokenMap = new HashMap<String, String>();
+			tokenMap.put("tokenId", tokenId);
+			tokenMap.put("newToken", newToken);
+			Date date = new Date();
+			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+			tokenMap.put("ttl", f.format(date));
+			int count = sqlSession.update("user.updateToken", tokenMap);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_5;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_6;
+	}
+
+	public int insertToken(Token token) {
+		try {
+			int count = sqlSession.insert("user.insertToken", token);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_1;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_2;
 	}
 }

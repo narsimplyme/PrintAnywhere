@@ -2,9 +2,13 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<typeAliases>
-		<typeAlias alias="user" type="com.capstone.dto.User"></typeAlias>
+		<typeAlias alias="user" type="com.capstone.dto.User"/>
+		<typeAlias alias="file" type="com.capstone.dto.File"/>
+		<typeAlias alias="token" type="com.capstone.dto.Token"/>
 	</typeAliases> 
 	<mappers>
     	<mapper resource="mybatis/mappers/user.xml"/>
+    	<mapper resource="mybatis/mappers/file.xml"/>
+    	<mapper resource="mybatis/mappers/token.xml"/>
 	</mappers>
 </configuration>

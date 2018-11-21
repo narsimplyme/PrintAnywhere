@@ -32,6 +32,12 @@
         <beans:property name="maxInMemorySize" value="100000000" />
         <beans:property name="defaultEncoding" value="utf-8"/>
 	</beans:bean>
+	
+	<!-- 다운로드를 위한 bean -->	
+	<beans:bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+	   <beans:property name="order" value="0"/>
+	</beans:bean>
+	
 	<context:component-scan base-package="com.capstone" />
 	<beans:bean id="factoryDao" class="com.capstone.model.FactoryDao" factory-method="getInstance" scope="singleton">
 			<beans:constructor-arg>
