@@ -9,6 +9,7 @@ public class File {
 	String fileDate;
 	String fileSize;
 	String userId;
+	int endFilePoint; 
 	
 	public File() {
 		super();
@@ -68,6 +69,14 @@ public class File {
 	}
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+	
+	public int getEndFilePoint() {
+		return endFilePoint;
+	}
+
+	public void setEndFilePoint(int endFilePoint) {
+		this.endFilePoint = endFilePoint;
 	}
 
 	@Override

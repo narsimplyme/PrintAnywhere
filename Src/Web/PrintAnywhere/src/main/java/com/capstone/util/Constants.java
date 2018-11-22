@@ -22,6 +22,8 @@ public class Constants {
 	public final static String MSG_CODE_109 = "REQUEST_ERROR";
 	/**HEADER TOKEN VALUE ERROR*/
 	public final static String MSG_CODE_110 = "HEADER_ERROR";
+	/**FILE_CREATE_ERROR*/
+	public final static String MSG_CODE_111 = "FILE_CREATE_ERROR";
 	/**INSERT후 변경된 값이 없음*/
 	public final static String MSG_CODE_301 = "NO_INSERT";
 	/**SELECT후 발견된 값이 없음*/
@@ -32,7 +34,8 @@ public class Constants {
 	public final static String MSG_CODE_305 = "NO_DELETE";
 	/**NO FILE*/
 	public final static String MSG_CODE_306 = "NO_FILE";
-
+	/**TOKEN CREATE ERROR*/
+	public final static String MSG_CODE_307 = "TOKEN_CREATE_ERROR";
 	
 	/**INSERT ERROR*/
 	public final static String ERROR_CODE_1 = "ERROR_CODE_1";

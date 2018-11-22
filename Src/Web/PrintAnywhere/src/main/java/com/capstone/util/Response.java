@@ -12,7 +12,6 @@ public class Response {
 	String message = "";
 	String errors = "";
 	JSONObject data = new JSONObject();
-	ArrayList<File> fileArray = new ArrayList<>();
 	
 	public Response() {
 		super();
@@ -45,13 +44,6 @@ public class Response {
 		this.data = data;
 	}
 
-	public ArrayList<File> getFileArray() {
-		return fileArray;
-	}
-
-	public void setFileArray(ArrayList<File> fileArray) {
-		this.fileArray = fileArray;
-	}
 
 	@Override
 	public String toString() {

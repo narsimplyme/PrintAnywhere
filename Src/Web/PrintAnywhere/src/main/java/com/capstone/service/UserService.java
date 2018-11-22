@@ -2,7 +2,9 @@ package com.capstone.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,21 +55,27 @@ public class UserService {
 		return new User("test1", "test2", "test3", "test4", "test5", "tes6", "tes7");
 	}
 
-	public int updateUser(User user, String userNewPw) {
-		return userDao.updateUser(user,userNewPw);
+	public int updateUser(User user) {
+		return userDao.updateUser(user);
 	}
 
-	public void updateToken(String newToken, String tokenId) {
-		userDao.updateToken(newToken, tokenId);
-	}
-
-	public void insertToken(String tokenId, String userId) {
+	public int updateToken(String newToken, String userId) {
+		Map<String, String> tokenMap = new HashMap<String, String>();
+		tokenMap.put("userId", userId);
+		tokenMap.put("newToken", newToken);
 		Date date = new Date();
 		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+		tokenMap.put("ttl", f.format(date));
+		
+		return userDao.updateToken(tokenMap);
+	}
 
+	public int insertToken(String tokenId, String userId) {
+		Date date = new Date();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
 		Token token = new Token(tokenId, f.format(date), userId);
 
-		userDao.insertToken(token);
+		return userDao.insertToken(token);
 	}
 
 }

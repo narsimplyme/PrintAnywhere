@@ -16,4 +16,10 @@
 			values (#{fileHash},#{fileName},#{fileType},#{userId})
 		]]>
 	</insert>
+	<select id="selectFileList" parameterType="file" resultMap="fileResult">
+		select * from file where user_id = #{userId} limit #{endFilePoint}
+	</select>
+	<delete id="deleteFile" parameterType="int">
+		DELETE FROM file WHERE file_id = #{fileId};
+	</delete>
 </mapper>

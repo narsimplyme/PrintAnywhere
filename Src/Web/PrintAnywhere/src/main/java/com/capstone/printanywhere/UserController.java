@@ -27,7 +27,6 @@ import com.capstone.util.Constants;
 import com.capstone.util.Response;
 
 @Controller
-@RequestMapping("/users")
 public class UserController {
 
 	Response res;
@@ -49,9 +48,20 @@ public class UserController {
 			res.setSuccess(true);
 			res.setMessage(Constants.MSG_CODE_200);
 			String token = AuthToken.getToken(user.getUserId());
-			userService.insertToken(token, user.getUserId());
-			data.put("token", token);
-			res.setData(data);	
+			int resCode = userService.insertToken(token, user.getUserId());
+			if(resCode == Constants.DB_RES_CODE_1) {
+				res.setSuccess(true);
+				res.setMessage(Constants.MSG_CODE_200);
+				data.put("token", token);
+				res.setData(data);
+			}else {
+				res.setSuccess(false);
+				if(resCode == Constants.DB_RES_CODE_9) 
+					res.setMessage(Constants.MSG_CODE_106);
+				else 
+					res.setMessage(Constants.MSG_CODE_307);
+			}
+			
 			//회원가입 성공
 
 		}else {
@@ -63,18 +73,19 @@ public class UserController {
 		return res;
 	}
 	
-	@RequestMapping(value = "signIn.do",  method = RequestMethod.GET)
+	@RequestMapping(value = "signIn.do",  method = RequestMethod.POST)
 	@ResponseBody
-	public Response signIn(String userId, String userPw) {
+	public Response signIn(@RequestBody User user) {
 		res = new Response();
 		data = new JSONObject();
-		
-		if(userService.signIn(userId, userPw)) {
+		if(userService.signIn(user.getUserId(), user.getUserPw())) {
 			//로그인 성공
 			res.setSuccess(true);
-			String newToken = AuthToken.getToken(userId);
-			userService.updateToken(newToken, userId);
+			String newToken = AuthToken.getToken(user.getUserId());
+			int resCode = userService.updateToken(newToken, user.getUserId());
 			data.put("token", newToken);
+			res.setSuccess(true);
+			res.setMessage(Constants.MSG_CODE_200);
 			res.setData(data);
 		}else {
 			//로그인 실패
@@ -88,13 +99,13 @@ public class UserController {
 	@RequestMapping(value = "authMe.do",  method = RequestMethod.GET)
 	@ResponseBody
 	public Response authMe(HttpServletRequest request) {
-		res = new Response();
 		data = new JSONObject();
 		
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
-			//인증 성공
+		res = AuthToken.isOk(authResult);
+		
+		if(res.isSuccess()) {
 			User user = userService.selectUser(authResult.getUserId());
 			if(user != null) {
 				res.setSuccess(true);
@@ -110,11 +121,6 @@ public class UserController {
 				data.put("token", tokenId);
 				data.put("ttl", authResult.getTtl());
 			}
-			
-		}else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -122,18 +128,20 @@ public class UserController {
 	@RequestMapping(value = "profile.do",  method = RequestMethod.PUT)
 	@ResponseBody
 	public Response profile(HttpServletRequest request, @RequestBody Map<String, String> map ) {
-		res = new Response();
 		data = new JSONObject();
+		
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
+		res = AuthToken.isOk(authResult);
+		
+		if(res.isSuccess()) {
 			ObjectMapper mapper = new ObjectMapper();
 			try {
 				User user = mapper.convertValue(map, User.class);
 				String userNewPw = map.get("userNewPw");
 				if(userNewPw.trim().length() > 1)
 					user.setUserPw(userNewPw);
-				int resCode = userService.updateUser(user, userNewPw);
+				int resCode = userService.updateUser(user);
 				if(resCode == Constants.DB_RES_CODE_5) {
 					res.setSuccess(true);
 					res.setMessage(Constants.MSG_CODE_200);
@@ -155,10 +163,6 @@ public class UserController {
 				return res;
 			}
 			
-		}else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -166,12 +170,13 @@ public class UserController {
 	@RequestMapping(value = "show.do",  method = RequestMethod.GET)
 	@ResponseBody
 	public Response show(HttpServletRequest request) {
-		res = new Response();
 		data = new JSONObject();
 
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
+		res = AuthToken.isOk(authResult);
+		
+		if(res.isSuccess()) {
 			//토큰 기반 유저 아이디 검색
 			User user = userService.selectUser(authResult.getUserId());
 			if(user != null) {
@@ -186,10 +191,6 @@ public class UserController {
 				data.put("token", tokenId);
 				data.put("ttl", authResult.getTtl());
 			}
-		}else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
 		}
 		return res;
 	}
@@ -202,16 +203,13 @@ public class UserController {
 
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
-			res.setSuccess(true);
-			res.setMessage(Constants.MSG_CODE_200);
+		res = AuthToken.isOk(authResult);
+		
+		if(res.isSuccess()) {
 			String newToken = AuthToken.getToken(authResult.getUserId());
 			userService.updateToken(newToken, authResult.getTokenId());
 			data.put("token", newToken);
-		} else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
+			res.setData(data);
 		}
 		return res;
 	}

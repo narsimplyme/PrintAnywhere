@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.capstone.dto.Token;
+
 public class AuthToken {
 	private String token;
 	
@@ -26,5 +28,30 @@ public class AuthToken {
 			SHA = null; 
 		}
 	return SHA;		
+	}
+	
+	public static Response isOk(Token token) {
+		Response res = new Response();
+		if(token == null) {
+			res.setSuccess(false);
+			res.setErrors(Constants.ERROR_CODE_7);
+			res.setMessage(Constants.MSG_CODE_110);
+		}else {
+			if(!token.isToken()) {
+				res.setSuccess(false);
+				res.setErrors(Constants.ERROR_CODE_5);
+				res.setMessage(Constants.MSG_CODE_107);
+			}else {
+				if(!token.isTTL()) {
+					res.setSuccess(false);
+					res.setErrors(Constants.ERROR_CODE_5);
+					res.setMessage(Constants.MSG_CODE_108);
+				}else {
+					res.setSuccess(true);
+				}
+			}
+		}
+		return res;
+		
 	}
 }

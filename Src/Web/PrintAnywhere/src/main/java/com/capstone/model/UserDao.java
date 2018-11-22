@@ -51,6 +51,7 @@ public class UserDao {
 				return Constants.DB_RES_CODE_3;
 			}
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			return Constants.DB_RES_CODE_9;
 		}
 		return Constants.DB_RES_CODE_4;
@@ -76,7 +77,7 @@ public class UserDao {
 		}
 	}
 
-	public int updateUser(User user, String userNewPw) {
+	public int updateUser(User user) {
 		try {
 			int count = sqlSession.update("user.updateUser", user);
 			if(count > 0) {
@@ -88,15 +89,9 @@ public class UserDao {
 		return Constants.DB_RES_CODE_6;
 	}
 
-	public int updateToken(String newToken, String tokenId) {
-		try {
-			Map<String, String> tokenMap = new HashMap<String, String>();
-			tokenMap.put("tokenId", tokenId);
-			tokenMap.put("newToken", newToken);
-			Date date = new Date();
-			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
-			tokenMap.put("ttl", f.format(date));
-			int count = sqlSession.update("user.updateToken", tokenMap);
+	public int updateToken(Map<String, String> tokenMap) {
+		try {		
+			int count = sqlSession.update("token.updateToken", tokenMap);
 			if(count > 0) {
 				return Constants.DB_RES_CODE_5;
 			}
@@ -108,7 +103,7 @@ public class UserDao {
 
 	public int insertToken(Token token) {
 		try {
-			int count = sqlSession.insert("user.insertToken", token);
+			int count = sqlSession.insert("token.insertToken", token);
 			if(count > 0) {
 				return Constants.DB_RES_CODE_1;
 			}

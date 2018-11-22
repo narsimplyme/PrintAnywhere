@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -39,34 +42,16 @@ public class FileDao {
 		this.factoryDao = factoryDao;
 	}
 
-	public ArrayList<File> selectFileList(String userId, int sizeOfList) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		ArrayList<File> fileArray = new ArrayList<File>();
-		String sql="select * from user where file = ?";
+	public List<File> selectFileList(String userId, int endFilePoint) {
 		try {
-			con = dataSource.getConnection();
-			pstmt=con.prepareStatement(sql);
-			pstmt.setString(1,userId);
-			rs = pstmt.executeQuery();
-			while(rs.next() && sizeOfList > 0) {
-				fileArray.add(new File(rs.getInt("file_id"), 
-						rs.getString("file_hash"), rs.getString("file_name"),
-						rs.getInt("file_type"), rs.getString("file_date"), 
-						rs.getString("file_date"), rs.getString("user_id")));
-				sizeOfList--;
-			}
-		} catch (SQLException e) {
-			return fileArray;
-		}finally {
-			try {
-				factoryDao.close(con, pstmt, rs);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			File file = new File();
+			file.setUserId(userId);
+			file.setEndFilePoint(endFilePoint);
+			List<File> list = sqlSession.selectList("file.selectFileList", file);
+			return list;
+		} catch (PersistenceException e) {
+			return null;
 		}
-		return fileArray;
 	}
 
 	public int insertFile(File file) {
@@ -79,5 +64,17 @@ public class FileDao {
 			return Constants.DB_RES_CODE_9;
 		}
 		return Constants.DB_RES_CODE_2;
+	}
+
+	public int deleteFile(int fileId) {
+		try {
+			int count = sqlSession.delete("file.deleteFile", fileId);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_7;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_8;
 	}
 }

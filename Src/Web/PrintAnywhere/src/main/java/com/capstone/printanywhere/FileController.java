@@ -9,8 +9,11 @@ import javax.servlet.http.HttpSession;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -19,6 +22,7 @@ import com.capstone.dto.File;
 import com.capstone.dto.Token;
 import com.capstone.service.FileService;
 import com.capstone.service.UserService;
+import com.capstone.util.AuthToken;
 import com.capstone.util.Constants;
 import com.capstone.util.Response;
 import com.capstone.util.UploadFile;
@@ -46,52 +50,42 @@ public class FileController {
 	@RequestMapping(value = "fileList.do",  method = RequestMethod.GET)
 	@ResponseBody
 	public Response fileList(int sizeOfList, HttpServletRequest request) {
-		res = new Response();
 		data = new JSONObject();
 		
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
-			if(authResult.isToken()) {
-				if(authResult.isTTL()) {
-					res.setSuccess(true);
-					ArrayList<File> fileArray = new ArrayList<>();
-					String userId = "admin";
-					fileArray = fileService.selectFileList(userId , sizeOfList);
-					data.put("fileList", fileArray);
-					res.setData(data);
-				}else {
-					//ttl이 없을경우
-					res.setSuccess(false);
-					res.setErrors(Constants.ERROR_CODE_5);
-					res.setMessage(Constants.MSG_CODE_108);
-				}
-			}else {
-				res.setSuccess(false);
-				res.setErrors(Constants.ERROR_CODE_5);
-				res.setMessage(Constants.MSG_CODE_107);
-				//token이 없을경우
-			}
-		}else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
+		res = AuthToken.isOk(authResult);
+		if(res.isSuccess()) {
+			List<File> fileArray = new ArrayList<>();
+			fileArray = fileService.selectFileList(authResult.getUserId() , sizeOfList);
+			data.put("fileList", fileArray);
+			res.setData(data);
 		}
 		return res;
 	}
 	
-	@RequestMapping(value = "fileDelete.do",  method = RequestMethod.GET)
+	@RequestMapping(value = "fileDelete.do",  method = RequestMethod.DELETE)
 	@ResponseBody
-	public Response fileDelete(HttpServletRequest request) {
+	public Response fileDelete(HttpServletRequest request, @RequestBody File file) {
 		res = new Response();
+		int fileId = file.getFileId();
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
-		if(authResult != null) {
-			//인증 성공했을경우 파일 삭제
-		}else {
-			res.setSuccess(false);
-			res.setErrors(Constants.ERROR_CODE_7);
-			res.setMessage(Constants.MSG_CODE_110);
+		res = AuthToken.isOk(authResult);
+		if(res.isSuccess()) {
+			int resCode = fileService.deleteFile(fileId);
+			if(resCode == Constants.DB_RES_CODE_7) {
+				res.setSuccess(true);
+				res.setMessage(Constants.MSG_CODE_200);
+			}else {
+				res.setSuccess(false);
+				if(resCode == Constants.DB_RES_CODE_9) {
+					res.setMessage(Constants.MSG_CODE_106);
+					res.setErrors(Constants.ERROR_CODE_4);
+				}else { 
+					res.setMessage(Constants.MSG_CODE_305);				
+				}
+			}
 		}
 		return res;
 	}
@@ -108,23 +102,20 @@ public class FileController {
 			res = new Response();
 			String tokenId = request.getHeader("x-access-token");
 			Token authResult = userService.isAuth(tokenId);
-			if(authResult != null) {
+			res = AuthToken.isOk(authResult);
+			if(res.isSuccess()) {
 				for (int i = 0; i < fileList.size(); i++) {
 					UploadFile uf = new UploadFile();
 					File file = uf.uploadFile(session, request, fileList.get(i));
 					if(file == null) {
 						res.setSuccess(false);
+						res.setMessage(Constants.MSG_CODE_111);
 					}else {
 						res.setSuccess(true);
 						file.setUserId(authResult.getUserId());
 						int resCode = fileService.insertFile(file);
 					}	
 				}				
-			}else {
-				//인증이 안됐을 경우
-				res.setSuccess(false);
-				res.setErrors(Constants.ERROR_CODE_7);
-				res.setMessage(Constants.MSG_CODE_110);
 			}
 		}
 		return res;
