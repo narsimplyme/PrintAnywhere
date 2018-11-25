@@ -2,14 +2,14 @@ package com.capstone.dto;
 
 public class File {
 	
-	int fileId;
-	String fileHash;
-	String fileName;
-	int fileType = 0;
-	String fileDate;
-	String fileSize;
-	String userId;
-	int endFilePoint; 
+	private int fileId;
+	private String fileHash;
+	private String fileName;
+	private int fileType = 0;
+	private String fileDate;
+	private String fileSize;
+	private String userId;
+	private int endFilePoint; 
 	
 	public File() {
 		super();

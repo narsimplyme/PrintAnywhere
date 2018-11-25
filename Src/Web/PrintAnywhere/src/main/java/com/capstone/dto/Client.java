@@ -2,31 +2,33 @@ package com.capstone.dto;
 
 public class Client {
 	
-	String clientId;
-	String clientName;
-	String clientLocation;
-	String clientIp;
-	String clientMac;
-	String clientLastSeen;
+	private int clientId;
+	private String clientName;
+	private String clientLatitude;
+	private String clientLongitude;
+	private String clientIp;
+	private String clientMac;
+	private String clientLastSeen;
 	
 	public Client() {
 		super();
 	}
-	public Client(String clientId, String clientName, String clientLocation, String clientIp, String clientMac,
+	public Client(int clientId, String clientName, String clientLatitude, String clientLongitude, String clientIp, String clientMac,
 			String clientLastSeen) {
 		super();
 		this.clientId = clientId;
 		this.clientName = clientName;
-		this.clientLocation = clientLocation;
+		this.clientLatitude = clientLatitude;
+		this.clientLongitude = clientLongitude;
 		this.clientIp = clientIp;
 		this.clientMac = clientMac;
 		this.clientLastSeen = clientLastSeen;
 	}
 	
-	public String getClientId() {
+	public int getClientId() {
 		return clientId;
 	}
-	public void setClientId(String clientId) {
+	public void setClientId(int clientId) {
 		this.clientId = clientId;
 	}
 	public String getClientName() {
@@ -35,11 +37,17 @@ public class Client {
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
 	}
-	public String getClientLocation() {
-		return clientLocation;
+	public String getClientLatitude() {
+		return clientLatitude;
 	}
-	public void setClientLocation(String clientLocation) {
-		this.clientLocation = clientLocation;
+	public void setClientLatitude(String clientLatitude) {
+		this.clientLatitude = clientLatitude;
+	}
+	public String getClientLongitude() {
+		return clientLongitude;
+	}
+	public void setClientLongitude(String clientLongitude) {
+		this.clientLongitude = clientLongitude;
 	}
 	public String getClientIp() {
 		return clientIp;
@@ -67,8 +75,10 @@ public class Client {
 		builder.append(clientId);
 		builder.append(", clientName=");
 		builder.append(clientName);
-		builder.append(", clientLocation=");
-		builder.append(clientLocation);
+		builder.append(", clientLatitude=");
+		builder.append(clientLatitude);
+		builder.append(", clientLongitude=");
+		builder.append(clientLongitude);
 		builder.append(", clientIp=");
 		builder.append(clientIp);
 		builder.append(", clientMac=");
@@ -78,5 +88,4 @@ public class Client {
 		builder.append("]");
 		return builder.toString();
 	}
-	
 }

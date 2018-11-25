@@ -52,7 +52,7 @@ public class UserService {
 
 	public User selectUserToToken(String token) {
 		// TODO Auto-generated method stub
-		return new User("test1", "test2", "test3", "test4", "test5", "tes6", "tes7");
+		return new User();
 	}
 
 	public int updateUser(User user) {
@@ -76,6 +76,14 @@ public class UserService {
 		Token token = new Token(tokenId, f.format(date), userId);
 
 		return userDao.insertToken(token);
+	}
+
+	public int isId(String userId) {
+		return userDao.isId(userId);
+	}
+
+	public int updatePoint(String userId, int point) {
+		return userDao.updatePoint(userId, point); 
 	}
 
 }

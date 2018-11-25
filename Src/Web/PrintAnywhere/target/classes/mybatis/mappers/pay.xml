@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pay">
+	<resultMap id="payResult" type="pay">
+		<result property="payId" column="pay_id"/>
+		<result property="payDate" column="pay_date"/>
+		<result property="payCash" column="pay_cash"/>
+		<result property="payType" column="pay_type"/>
+		<result property="userId" column="user_id"/>
+	</resultMap>
+	
+	<insert id="insertPay" parameterType="pay">
+		insert into pay (pay_cash, user_id) 
+		values (#{payCash},#{userId})
+	</insert>
+	<select id="selectPayList" parameterType="pay" resultMap="payResult">
+		select * from pay where user_id = #{userId} order by pay_id limit #{payStartPoint}, #{payEndPoint} 
+	</select>
+
+</mapper>

@@ -24,14 +24,14 @@ public class User {
 	@JsonProperty("userPhoneNumber")
 	private String userPhoneNumber;
 	@JsonProperty("userPoint")
-	private String userPoint;
+	private int userPoint;
 	
 	public User() {
 		super();
 	}
 	
 	public User(String userId, String userPw, String userName, String userMail, String userNickname,
-			String userPhoneNumber, String userPoint) {
+			String userPhoneNumber, int userPoint) {
 		super();
 		this.userId = userId;
 		this.userPw = userPw;
@@ -78,10 +78,10 @@ public class User {
 	public void setUserPhoneNumber(String userPhoneNumber) {
 		this.userPhoneNumber = userPhoneNumber;
 	}
-	public String getUserPoint() {
+	public int getUserPoint() {
 		return userPoint;
 	}
-	public void setUserPoint(String userPoint) {
+	public void setUserPoint(int userPoint) {
 		this.userPoint = userPoint;
 	}
 

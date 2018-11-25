@@ -106,6 +106,23 @@ public class UserController {
 		res = AuthToken.isOk(authResult);
 		
 		if(res.isSuccess()) {
+			data.put("token", tokenId);
+			data.put("ttl", authResult.getTtl());
+			res.setData(data);
+		}
+		return res;
+	}
+	
+	@RequestMapping(value = "authMeFull.do",  method = RequestMethod.GET)
+	@ResponseBody
+	public Response authMeFull(HttpServletRequest request) {
+		data = new JSONObject();
+		
+		String tokenId = request.getHeader("x-access-token");
+		Token authResult = userService.isAuth(tokenId);
+		res = AuthToken.isOk(authResult);
+		
+		if(res.isSuccess()) {
 			User user = userService.selectUser(authResult.getUserId());
 			if(user != null) {
 				res.setSuccess(true);
@@ -205,13 +222,37 @@ public class UserController {
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);
 		
-		if(res.isSuccess()) {
+		if(res.getMessage() == Constants.MSG_CODE_108) {
+			System.out.println("refresh");
 			String newToken = AuthToken.getToken(authResult.getUserId());
-			userService.updateToken(newToken, authResult.getTokenId());
+			userService.updateToken(newToken, authResult.getUserId());
+			res.setSuccess(true);
+			res.setErrors("");
+			res.setMessage(Constants.MSG_CODE_200);
 			data.put("token", newToken);
 			res.setData(data);
 		}
 		return res;
 	}
+	
+	@RequestMapping(value = "isId.do",  method = RequestMethod.GET)
+	@ResponseBody
+	public Response isId(HttpServletRequest request, String userId) {
+		res = new Response();
+		data = new JSONObject();
 		
+		int resCode = userService.isId(userId);
+		if(resCode == Constants.DB_RES_CODE_4) {
+			res.setSuccess(true);
+		}else {
+			if(resCode == Constants.DB_RES_CODE_9) {
+				res.setErrors(Constants.ERROR_CODE_2);
+				res.setMessage(Constants.MSG_CODE_106);
+			}
+			res.setSuccess(false);
+		}
+		return res;
+	}
+	
+	
 }

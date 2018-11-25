@@ -35,4 +35,10 @@
 			, user_phoneNumber = #{userPhoneNumber} WHERE (user_id = #{userId});
 		]]>
 	</update>
+	
+	<update id="updatePoint" parameterType="user">
+		<![CDATA[
+			UPDATE user SET user_point = user_point+#{userPoint} WHERE (user_id = #{userId});
+		]]>
+	</update>
 </mapper>

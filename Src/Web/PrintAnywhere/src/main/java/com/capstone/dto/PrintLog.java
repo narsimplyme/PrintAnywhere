@@ -2,11 +2,11 @@ package com.capstone.dto;
 
 public class PrintLog {
 	
-	int printId;
-	String clientId;
-	String printCount;
-	String fileId;
-	String userId;
+	private int printId;
+	private String clientId;
+	private String printCount;
+	private String fileId;
+	private String userId;
 	
 	public PrintLog() {
 		super();

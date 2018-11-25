@@ -19,6 +19,9 @@
 	<select id="selectFileList" parameterType="file" resultMap="fileResult">
 		select * from file where user_id = #{userId} limit #{endFilePoint}
 	</select>
+	<select id="fileDownload" parameterType="int" resultType="string">
+		select file_hash from file where file_id = #{fileId}
+	</select>
 	<delete id="deleteFile" parameterType="int">
 		DELETE FROM file WHERE file_id = #{fileId};
 	</delete>

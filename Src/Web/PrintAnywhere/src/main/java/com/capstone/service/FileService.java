@@ -31,4 +31,8 @@ public class FileService {
 		return fileDao.deleteFile(fileId);
 	}
 
+	public String fileDownload(int fileId) {
+		return fileDao.fileDownload(fileId);
+	}
+
 }

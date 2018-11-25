@@ -65,7 +65,7 @@ public class Token {
 		try {
 			d1 = f.parse(this.ttl);
 			d2 = f.parse(f.format(date));
-			long diff = d1.getTime() - d2.getTime();
+			long diff = d2.getTime() - d1.getTime();
 			long min = diff / (1000*60);
 			if(min > 30)
 				return false;

@@ -5,10 +5,12 @@
 		<typeAlias alias="user" type="com.capstone.dto.User"/>
 		<typeAlias alias="file" type="com.capstone.dto.File"/>
 		<typeAlias alias="token" type="com.capstone.dto.Token"/>
+		<typeAlias alias="pay" type="com.capstone.dto.Pay"/>
 	</typeAliases> 
 	<mappers>
     	<mapper resource="mybatis/mappers/user.xml"/>
     	<mapper resource="mybatis/mappers/file.xml"/>
     	<mapper resource="mybatis/mappers/token.xml"/>
+       	<mapper resource="mybatis/mappers/pay.xml"/>
 	</mappers>
 </configuration>

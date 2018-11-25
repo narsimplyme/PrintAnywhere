@@ -24,6 +24,8 @@ public class Constants {
 	public final static String MSG_CODE_110 = "HEADER_ERROR";
 	/**FILE_CREATE_ERROR*/
 	public final static String MSG_CODE_111 = "FILE_CREATE_ERROR";
+	/**USER_POINT_UPDATE_ERROR*/
+	public final static String MSG_CODE_112 = "USER_POINT_UPDATE_ERROR";
 	/**INSERT후 변경된 값이 없음*/
 	public final static String MSG_CODE_301 = "NO_INSERT";
 	/**SELECT후 발견된 값이 없음*/
@@ -70,4 +72,6 @@ public class Constants {
 	/**DB 오류*/
 	public final static int DB_RES_CODE_9 = 6;
 	
+	
+	public final static int NEAR_CLIENT_CNT = 5;
 }

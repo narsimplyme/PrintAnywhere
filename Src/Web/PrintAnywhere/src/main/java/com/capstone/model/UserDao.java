@@ -92,10 +92,13 @@ public class UserDao {
 	public int updateToken(Map<String, String> tokenMap) {
 		try {		
 			int count = sqlSession.update("token.updateToken", tokenMap);
+			System.out.println(count);
+			System.out.println(tokenMap);
 			if(count > 0) {
 				return Constants.DB_RES_CODE_5;
 			}
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			return Constants.DB_RES_CODE_9;
 		}
 		return Constants.DB_RES_CODE_6;
@@ -111,5 +114,32 @@ public class UserDao {
 			return Constants.DB_RES_CODE_9;
 		}
 		return Constants.DB_RES_CODE_2;
+	}
+
+	public int isId(String userId) {
+		try {
+			String result = sqlSession.selectOne("user.signIn", userId);
+			if(result != null)
+				return Constants.DB_RES_CODE_3;
+			
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_4;
+	}
+
+	public int updatePoint(String userId, int userPoint) {
+		try {
+			User user = new User();
+			user.setUserId(userId);
+			user.setUserPoint(userPoint);
+			int count = sqlSession.update("user.updatePoint", user);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_5;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_6;
 	}
 }

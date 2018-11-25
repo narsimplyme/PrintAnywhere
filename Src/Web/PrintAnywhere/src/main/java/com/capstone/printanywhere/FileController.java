@@ -124,14 +124,29 @@ public class FileController {
 	
 	@RequestMapping(value = "fileDownload.do",  method = RequestMethod.GET)
 	@ResponseBody
-	public Response fileDownload(HttpSession session) {
-		String uploadPath = session.getServletContext().getRealPath("/");
-	    String attachPath = "resources/file/";
-		String savePath = uploadPath+attachPath+"test.pdf";
+	public Response fileDownload(HttpSession session, HttpServletRequest request, int fileId) {
 		data = new JSONObject();
-		res = new Response();
-		data.put("fileUrl", savePath);
-        res.setData(data);
+
+		String tokenId = request.getHeader("x-access-token");
+		Token authResult = userService.isAuth(tokenId);
+		res = AuthToken.isOk(authResult);
+		if(res.isSuccess()) {
+			String fileHash = fileService.fileDownload(fileId);
+			if(fileHash == null) {
+				res.setErrors(Constants.ERROR_CODE_2);
+				res.setMessage(Constants.MSG_CODE_103);
+				return res;
+			}
+			/*String uploadPath = request.getContextPath();
+		    String attachPath = "/resources/file/";
+			String savePath = uploadPath+attachPath+fileHash;
+			그냥 고정값 쓰는걸로
+			*/
+			data.put("fileUrl", "http://printaw.com/resources/file/"+fileHash);
+	        res.setData(data);	
+	        res.setMessage(Constants.MSG_CODE_200);
+		}
+		
 		return res;
 	}
 

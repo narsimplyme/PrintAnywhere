@@ -19,7 +19,7 @@
 	</select>
 	<update id="updateToken" parameterType="hashmap">
 		<![CDATA[
-			UPDATE token SET token_id = #{newToken} WHERE (user_id = #{userId});
+			UPDATE token SET token_id = #{newToken}, ttl = #{ttl} WHERE (user_id = #{userId});
 		]]>
 	</update>
 </mapper>

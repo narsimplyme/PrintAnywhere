@@ -77,4 +77,12 @@ public class FileDao {
 		}
 		return Constants.DB_RES_CODE_8;
 	}
+
+	public String fileDownload(int fileId) {
+		try {
+			return sqlSession.selectOne("file.fileDownload", fileId);
+		} catch (PersistenceException e) {
+			return null;
+		}
+	}
 }
