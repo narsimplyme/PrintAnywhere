@@ -5,7 +5,7 @@
         <h2 class="mdl-card__title-text">SingUp</h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <form @submit="onSingUp">
+        <div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="username" v-model="username" />
             <label class="mdl-textfield__label" for="username">아이디</label>
@@ -15,8 +15,9 @@
             <label class="mdl-textfield__label" for="password">비밀번호</label>
           </div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input class="mdl-textfield__input" type="password" id="passwordConfirm" v-model="passwordConfirm" />
-            <label class="mdl-textfield__label" for="passwordConfirm">비밀번호 확인</label>
+            <input class="mdl-textfield__input" type="password" id="passwordConfirm" v-model="passwordConfirm" v-on:change="onCheckPassword()" />
+            <label class="mdl-textfield__label" id="passwordConfirmLabel" for="passwordConfirm">비밀번호 확인</label>
+            <span class="mdl-textfield__error" id="passwordConfirmError" name="passwordConfirmError">비밀번호가 동일해야 합니다.</span>
           </div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="name" v-model="name" />
@@ -36,14 +37,15 @@
             <label class="mdl-textfield__label" for="email">이메일</label>
             <span class="mdl-textfield__error">올바른 이메일 형식을 입력해 주세요.</span>
           </div>
-          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">SingUp</button>
-        </form>
+          <button type="button" v-on:click="onSignUp ()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">SingUp</button>
+        </div>
       </div>
     </div>
   </main>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'singup',
   data () {
@@ -52,24 +54,67 @@ export default {
     }
   },
   methods: {
+    onCheckPassword () {
+      if (this.password === '' || this.passwordConfirm === '') {
+        return false
+      }
+      if (this.password !== this.passwordConfirm) {
+        document.getElementById('passwordConfirmLabel').style.color = '#d50000'
+        document.getElementById('passwordConfirmError').style.visibility = 'visible'
+        return false
+      } else {
+        document.getElementById('passwordConfirmLabel').style.color = 'rgb(63,81,181)'
+        document.getElementById('passwordConfirmError').style.visibility = 'hidden'
+        return true
+      }
+    },
     onSignUp () {
       if (this.username === '' || this.password === '' || this.passwordConfirm === '' || this.name === '' || this.nickName === '' || this.phone === '' || this.email === '') {
         return
       }
-      this.$router.push('/')
-      location.reload()
-    },
-    setAuth () {
-      var value = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')
-      if (value[2] === '') {
-        this.auth = false
-      } else {
-        this.auth = true
+      if (this.onCheckPassword() === false) {
+        return
       }
-      if (this.auth) {
+      axios.post('http://printaw.com/signUp.do', {
+        'userId': this.username,
+        'userPw': this.password,
+        'userName': this.name,
+        'userMail': this.email,
+        'userNickname': this.nickName,
+        'userPhoneNumber': this.phone
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+      ).then(response => {
+        document.cookie = `accessToken=${(response.data.data.token)}`
         this.$router.push('/')
         location.reload()
+      }).catch(errors => {
+
+      })
+    },
+    setAuth () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      if (token === '') {
+        this.auth = false
+        return
       }
+      axios.get('http://printaw.com/authMe.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        if (response.data.success === true) {
+          this.auth = true
+          this.$router.push('/')
+          location.reload()
+        }
+      }).catch(errors => {
+        this.auth = false
+      })
     }
   },
   beforeMount () {

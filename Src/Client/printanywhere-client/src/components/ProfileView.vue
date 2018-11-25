@@ -5,7 +5,7 @@
         <h2 class="mdl-card__title-text">Profile</h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <form @submit="onChangeProfile">
+        <div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="username" v-model="username" disabled/>
             <label class="mdl-textfield__label" for="username">아이디</label>
@@ -46,52 +46,128 @@
             <label class="mdl-textfield__label" for="email">이메일*</label>
             <span class="mdl-textfield__error">올바른 이메일 형식을 입력해 주세요.</span>
           </div>
-          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Change</button>
-        </form>
+          <button v-on:click="onChangeProfile ()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Change</button>
+        </div>
       </div>
     </div>
   </main>
 </template>
 
 <script>
-import testuser from '../temp/testuser'
-
+import axios from 'axios'
 export default {
   name: 'profile',
   data () {
     return {
       auth: false,
-      username: testuser.test_user.userId,
-      point: testuser.test_user.userPoint,
-      name: testuser.test_user.userName,
-      nickName: testuser.test_user.userNickName,
-      phone: testuser.test_user.userPhoneNumber,
-      email: testuser.test_user.userMail
+      username: ' ',
+      password: '',
+      name: ' ',
+      nickName: ' ',
+      email: 'a@a.com',
+      point: ' ',
+      phone: '0',
+      originPassword: ''
     }
   },
   methods: {
     onChangeProfile () {
-      if (this.name === '' || this.nickName === '' || this.phone === '' || this.email === '') {
+      // requried
+      if (this.name === '' || this.nickName === '' || this.phone === '' || this.email === '' || this.password === '') {
         return
       }
-      this.$router.push('/')
-      location.reload()
+      if (this.originPassword !== this.password) {
+        return
+      }
+      if (this.newPassword !== this.newPasswordConfirm) {
+        return
+      }
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.put('http://printaw.com/profile.do', {
+        'userId': this.username,
+        'userPw': this.password,
+        'userName': this.name,
+        'userMail': this.email,
+        'userNickname': this.nickName,
+        'userPhoneNumber': this.phone,
+        'userNewPw': this.newPassword
+      },
+      {
+        headers: {
+          'x-access-token': token,
+          'Content-Type': 'application/json'
+        }
+      }).then(response => {
+
+      }).catch(errors => {
+
+      })
+    },
+    onAuthMe () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://printaw.com/authMeFull.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        if (response.data.success === true) {
+          this.username = response.data.data.user.userId
+          this.originPassword = response.data.data.user.userPw
+          this.name = response.data.data.user.userName
+          this.email = response.data.data.user.userMail
+          this.phone = response.data.data.user.userPhoneNumber
+          this.point = response.data.data.user.userPoint
+          this.nickName = response.data.data.user.userNickname
+        }
+      }).catch(errors => {
+
+      })
     },
     setAuth () {
-      var value = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')
-      if (value[2] === '') {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      if (token === '') {
         this.auth = false
-      } else {
-        this.auth = true
-      }
-      if (!this.auth) {
         this.$router.push('/')
         location.reload()
+        return
       }
+      axios.get('http://printaw.com/authMe.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        if (response.data.success === false) {
+          this.refreshToken()
+        } else {
+          this.auth = true
+        }
+      }).catch(errors => {
+        document.cookie = `accessToken=`
+        this.auth = false
+        this.$router.push('/')
+        location.reload()
+      })
+    },
+    refreshToken () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://printaw.com/refresh.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        document.cookie = `accessToken=${(response.data.data.token)}`
+        this.auth = true
+      }).catch(errors => {
+        document.cookie = `accessToken=`
+        this.auth = false
+        this.$router.push('/')
+        location.reload()
+      })
     }
   },
   beforeMount () {
     this.setAuth()
+    this.onAuthMe()
   }
 }
 </script>

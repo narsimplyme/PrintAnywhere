@@ -28,8 +28,6 @@ export default {
   name: 'singin',
   data () {
     return {
-      username: '',
-      password: '',
       auth: false
     }
   },
@@ -38,24 +36,42 @@ export default {
       if (this.username === '' || this.password === '') {
         return
       }
-      // TODO api/auth/signin [POST]
-      document.cookie = `accessToken=${(this.username + this.password)}`
-      document.cookie = `uid=${(this.username)}`
-      axios.defaults.headers.common['x-access-token'] = this.username + this.password
-      this.$router.push('/')
-      location.reload()
+      axios.post('http://printaw.com/signIn.do', {
+        'userId': this.username,
+        'userPw': this.password
+      }).then(response => {
+        if (response.data.success === true) {
+          document.cookie = `accessToken=${(response.data.data.token)}`
+          this.$router.push('/')
+          location.reload()
+        } else {
+          if (response.data.errors === 'ERROR_CODE_2') {
+            alert('아이디 혹은 비밀번호를 확인해주십시오.')
+          }
+        }
+      }).catch(errors => {
+
+      })
     },
     setAuth () {
-      var value = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')
-      if (value[2] === '') {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      if (token === '') {
         this.auth = false
-      } else {
-        this.auth = true
+        return
       }
-      if (this.auth) {
-        this.$router.push('/')
-        location.reload()
-      }
+      axios.get('http://printaw.com/authMe.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        if (response.data.success === true) {
+          this.auth = true
+          this.$router.push('/')
+          location.reload()
+        }
+      }).catch(errors => {
+        this.auth = false
+      })
     }
   },
   beforeMount () {

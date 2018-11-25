@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 require('material-design-lite')
 export default {
   name: 'app',
@@ -36,9 +37,6 @@ export default {
     return {
       auth: false
     }
-  },
-  beforeMount () {
-    this.setAuth()
   },
   methods: {
     hideMenu: function () {
@@ -48,19 +46,47 @@ export default {
     },
     unAuth: function () {
       document.cookie = `accessToken=`
-      document.cookie = `uid=`
       document.getElementsByClassName('mdl-layout__drawer')[0].classList.remove('is-visible')
       document.getElementsByClassName('mdl-layout__obfuscator')[0].classList.remove('is-visible')
       location.reload()
     },
-    setAuth: function () {
-      var value = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')
-      if (value[2] === '') {
+    setAuth () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      if (token === '') {
         this.auth = false
-      } else {
-        this.auth = true
+        return
       }
+      axios.get('http://printaw.com/authMe.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        if (response.data.success === false) {
+          this.refreshToken()
+        } else {
+          this.auth = true
+        }
+      }).catch(errors => {
+        this.auth = false
+      })
+    },
+    refreshToken () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://printaw.com/refresh.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        document.cookie = `accessToken=${(response.data.data.token)}`
+        this.auth = true
+      }).catch(errors => {
+        document.cookie = `accessToken=`
+      })
     }
+  },
+  beforeMount () {
+    this.setAuth()
+    this.onGetFileList()
   }
 }
 </script>
