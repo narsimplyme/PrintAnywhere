@@ -119,9 +119,11 @@
             </Grid.ColumnDefinitions>
 
             <Image Grid.Column="0" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/userIcon.png"/>
-            <TextBlock x:Name="UserID" Text="{Binding _userName}" Grid.Column="1" HorizontalAlignment="Center" Height="33" TextWrapping="Wrap" VerticalAlignment="Center" Width="90"/>
-            <Image Grid.Column="2" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/pointIcon.png"/>
-            <TextBlock x:Name="Point" Text="{Binding _userPoint}" Grid.Column="3" HorizontalAlignment="Center" Height="33" TextWrapping="Wrap" VerticalAlignment="Center" Width="90"/>
+            <TextBlock x:Name="UserID" Text="{Binding _userName}" Grid.Column="1" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
+            <Image Grid.Column="2" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/userIcon.png"/>
+            <TextBlock x:Name="Point" Text="{Binding _userPoint}" Grid.Column="3" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
+            <Button Content="로그아웃" Grid.Column="4" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent"></Button>
+
 
         </Grid>
 
@@ -146,19 +148,20 @@
                     <DataTemplate>
                         <Grid Width="382" Background="#4CFFFFFF">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="132*"/>
-                                <ColumnDefinition Width="250*"/>
+                                <ColumnDefinition Width="72*"/>
+                                <ColumnDefinition Width="310*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
-                                <RowDefinition Height="40"/>
+                                <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Grid Grid.RowSpan="3" Margin="0,0,12,0" Background="{Binding FileID}" Width="120" Height="120" HorizontalAlignment="Left">
-                                <TextBlock Text="{Binding FileSize}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Foreground="White"/>
+                            <Grid Grid.RowSpan="3" Margin="0,0,2,0" Background="SkyBlue" Width="60" Height="60" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding FileType}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" Foreground="White"/>
                             </Grid>
-                            <TextBlock Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding FileName}" FontSize="16" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding FileUploadDate}" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding FileName}" FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding FileUploadDate}" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding FileSize}" TextWrapping="Wrap"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -174,9 +177,9 @@
         </Grid>
 
         <!--File List-->
-        
-        
-        
+
+
+
         <Grid Grid.Row="3"  Grid.Column="1">
 
         </Grid>
@@ -188,6 +191,11 @@
 
         <!--submit-->
         <Grid Grid.Row="3" Grid.Column="1">
+            <Button Content="인쇄" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent"/>
+
+            <Button Content="미리보기" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="75,0,0,0"/>
+            <Button Content="로그인 연장" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="309,0,0,0"/>
+
             <!--<Button  Grid.ColumnSpan="2"
                      Margin="3,2,3,5"
                      Content="로그인" 

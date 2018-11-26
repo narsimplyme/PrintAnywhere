@@ -34,9 +34,9 @@ namespace PrintAnywhere
             
             Items = new ObservableCollection<FileList>()
                         {
-                            new FileList(213120,"File0",1,13123,"SSS"),
-                            new FileList(112312,"File2",1,13123,"SSS"),
-                            new FileList(123122,"File4",1,13123,"C:\\CAP.xml"),
+                            new FileList(213120,"File0.pdf","PDF",13123,"SSS"),
+                            new FileList(112312,"File2.pdf","PDF",13123,"SSS"),
+                            new FileList(123122,"File4.pdf","PDF",13123,"C:\\CAP.xml"),
                         };
 
             ShowSelectedCommand = new RelayCommand<IEnumerable<object>>(ShowSelected, CanShowSelected);

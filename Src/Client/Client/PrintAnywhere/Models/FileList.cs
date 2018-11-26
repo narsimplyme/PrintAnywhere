@@ -10,7 +10,7 @@ namespace PrintAnywhere.Models
     {
         public int FileID { get; set; }
         public string FileName { get; set; }
-        public int FileType { get; set; }
+        public string FileType { get; set; }
         public int FileSize { get; set; }
         public string FileUploadDate { get; set; }
 
@@ -20,7 +20,7 @@ namespace PrintAnywhere.Models
             return FileName;
         }
 
-        public FileList(int id, string name, int type, int size, string date)
+        public FileList(int id, string name, string type, int size, string date)
         {
             this.FileID = id;
             this.FileName = name;
