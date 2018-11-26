@@ -26,6 +26,8 @@ public class Constants {
 	public final static String MSG_CODE_111 = "FILE_CREATE_ERROR";
 	/**USER_POINT_UPDATE_ERROR*/
 	public final static String MSG_CODE_112 = "USER_POINT_UPDATE_ERROR";
+	/**lat_lon_ERROR*/
+	public final static String MSG_CODE_113 = "NO_VALUE_POSITION";
 	/**INSERT후 변경된 값이 없음*/
 	public final static String MSG_CODE_301 = "NO_INSERT";
 	/**SELECT후 발견된 값이 없음*/
@@ -53,6 +55,8 @@ public class Constants {
 	public final static String ERROR_CODE_6 = "ERROR_CODE_6";
 	/**HEADER TOKEN VALUE ERROR*/
 	public final static String ERROR_CODE_7 = "ERROR_CODE_7";
+	/**HEADER TOKEN VALUE ERROR*/
+	public final static String ERROR_CODE_8 = "ERROR_CODE_8";
 	/**DB에 정상적으로 insert함.*/
 	public final static int DB_RES_CODE_1 = 1;
 	/**DB에 정상적으로 insert하지 못함.*/

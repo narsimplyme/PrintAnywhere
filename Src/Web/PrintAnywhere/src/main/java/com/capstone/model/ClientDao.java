@@ -7,10 +7,11 @@ import javax.sql.DataSource;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.capstone.dto.Client;
 
-
+@Repository
 public class ClientDao {
 	@Autowired
 	private DataSource dataSource;

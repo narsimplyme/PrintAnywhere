@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bookmark">
+	<resultMap id="bookmarkResult" type="bookmark">
+		<result property="userId" column="user_id"/>
+		<result property="clientId" column="client_id"/>
+	</resultMap>
+
+	<insert id="insertBookMark" parameterType="bookmark">
+		insert into bookmark (user_id, client_id) 
+		values (#{userId},#{clientId})
+	</insert>
+	
+	<select id="selectBookMarkList" parameterType="string" resultMap="bookmarkResult">
+		select * from bookmark
+	</select>
+	
+	<delete id="deleteBookMark">
+		DELETE FROM bookmark WHERE user_id = #{userId} and client_id = #{clientId};
+	</delete>
+</mapper>

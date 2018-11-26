@@ -56,8 +56,10 @@ public class FileController {
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);
 		if(res.isSuccess()) {
-			List<File> fileArray = new ArrayList<>();
-			fileArray = fileService.selectFileList(authResult.getUserId() , sizeOfList);
+			List<File> fileArray = fileService.selectFileList(authResult.getUserId() , sizeOfList);
+			if(fileArray == null) {
+				fileArray = new ArrayList<>();
+			}
 			data.put("fileList", fileArray);
 			res.setData(data);
 		}

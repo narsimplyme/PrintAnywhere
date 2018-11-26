@@ -47,6 +47,8 @@ public class ClientService {
 		});
 		
 		for (int i = 0; i < Constants.NEAR_CLIENT_CNT; i++) {
+			if(i >= distMapArray.size())
+				break;
 			int clientId = distMapArray.get(i).getCustomerId();
 			for (int j = 0; j < clientArray.size(); j++) {
 				if(clientArray.get(j).getClientId() == clientId) {

@@ -48,6 +48,7 @@ public class AuthToken {
 					res.setMessage(Constants.MSG_CODE_108);
 				}else {
 					res.setSuccess(true);
+					res.setMessage(Constants.MSG_CODE_200);
 				}
 			}
 		}

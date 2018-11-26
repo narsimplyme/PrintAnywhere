@@ -33,14 +33,6 @@ public class FileDao {
 	public void setSqlSession(SqlSession sqlSession) {
 		this.sqlSession = sqlSession;
 	}
-	
-	
-	private FactoryDao factoryDao;
-	
-	@Autowired
-	public void setFactoryDao(FactoryDao factoryDao) {
-		this.factoryDao = factoryDao;
-	}
 
 	public List<File> selectFileList(String userId, int endFilePoint) {
 		try {

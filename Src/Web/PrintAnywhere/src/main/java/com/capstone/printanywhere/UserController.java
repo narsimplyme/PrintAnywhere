@@ -156,7 +156,7 @@ public class UserController {
 			try {
 				User user = mapper.convertValue(map, User.class);
 				String userNewPw = map.get("userNewPw");
-				if(userNewPw.trim().length() > 1)
+				if(userNewPw != null)
 					user.setUserPw(userNewPw);
 				int resCode = userService.updateUser(user);
 				if(resCode == Constants.DB_RES_CODE_5) {
@@ -221,9 +221,8 @@ public class UserController {
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);
-		
-		if(res.getMessage() == Constants.MSG_CODE_108) {
-			System.out.println("refresh");
+		System.out.println(res);
+		if(res.getMessage() == Constants.MSG_CODE_108 || res.getMessage() == Constants.MSG_CODE_200) {
 			String newToken = AuthToken.getToken(authResult.getUserId());
 			userService.updateToken(newToken, authResult.getUserId());
 			res.setSuccess(true);
