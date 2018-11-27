@@ -1,17 +1,25 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using PrintAnywhere.Comm;
+﻿using PrintAnywhere.Comm;
 using PrintAnywhere.Models;
 using PrintAnywhere.Views;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Script.Serialization;
+using System.Windows;
+using System.Windows.Input;
 
 namespace PrintAnywhere.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
-        
+
+        private static readonly HttpClient client = new HttpClient();
+
 
         private readonly Action _closeAction;
 
@@ -143,13 +151,13 @@ namespace PrintAnywhere.ViewModels
                 return _hideResultCmd;
             }
         }
-        
+
         public LoginViewModel(Action closeAction)
         {
             this._closeAction = closeAction;
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -174,7 +182,7 @@ namespace PrintAnywhere.ViewModels
 
                 Console.WriteLine("2");
             }
-            catch (TaskCanceledException ex) 
+            catch (TaskCanceledException ex)
             {
                 ResultDescription = ex.Message;
 
@@ -215,6 +223,55 @@ namespace PrintAnywhere.ViewModels
         {
             return await Task.Run(async () =>
             {
+                string uri = "http://xdkyu02.cafe24.com/signIn.do";
+                string uri2 = "http://xdkyu02.cafe24.com/signUp.do";
+
+                string json = new JavaScriptSerializer().Serialize(new
+                {
+                    userID = "merom",
+                    userPw = "123456",
+                });
+
+                //string requestJson = "{\"userId\":" + _userName + ", \"userPw\":" + _userPwd + "}";
+
+                using (var client = new HttpClient())
+                {
+                    var response = await client.PostAsync(
+                        uri,
+                         new StringContent(json, Encoding.UTF8, "application/json"));
+                    Console.WriteLine(response);
+                }
+
+
+                //var request = (HttpWebRequest)WebRequest.Create(uri2);
+                //request.ContentType = "application/json";
+                //request.Method = "POST";
+
+                //using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                //{
+                //    string json = new JavaScriptSerializer().Serialize(new
+                //    {
+                //        userID = "merom",
+                //        userPw = "123456",
+                //        userPwConfirm = "123456",
+                //        userName = "Merom",
+                //        userNickName = "Merom",
+                //        userMail = "narsimplyme@naver.com",
+                //        userPhoneNumber="12345"
+                //    });
+
+                //    streamWriter.Write(json);
+                //}
+
+                //var response = (HttpWebResponse)request.GetResponse();
+                //using (var streamReader = new StreamReader(response.GetResponseStream()))
+                //{
+                //    var result = streamReader.ReadToEnd();
+                //    Console.WriteLine(result);
+                //}
+
+
+
                 var model = await GetUserInfoAsync(progress, ct);
 
                 if (!model.UserName.Equals("test", StringComparison.OrdinalIgnoreCase)
@@ -306,7 +363,7 @@ namespace PrintAnywhere.ViewModels
             _closeAction.Invoke();
             winMain.Show();
         }
-        
+
 
     }
 }
