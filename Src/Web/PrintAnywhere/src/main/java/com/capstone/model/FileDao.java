@@ -77,4 +77,13 @@ public class FileDao {
 			return null;
 		}
 	}
+
+	public File selectFile(int fileId) {
+		try {
+			File file = sqlSession.selectOne("file.selectFile", fileId);
+			return file;
+		} catch (PersistenceException e) {
+			return new File();
+		}
+	}
 }

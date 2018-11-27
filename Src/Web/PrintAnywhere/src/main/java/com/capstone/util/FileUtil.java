@@ -9,12 +9,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-public class UploadFile {
+public class FileUtil {
 	
 	public com.capstone.dto.File uploadFile(HttpSession session, MultipartHttpServletRequest request, MultipartFile uploadFile) {
 		com.capstone.dto.File f;
@@ -57,7 +58,30 @@ public class UploadFile {
 		return f;
 	}
 	
+	public int deleteFile(HttpServletRequest request, com.capstone.dto.File f) {
+        String filePath = getSaveLocationDelete(request) + f.getFileHash();
+        System.out.println(filePath);
+		File file = new File(filePath); 
+		if( file.exists() ){ 
+			if(file.delete()){ 
+				System.out.println("파일삭제 성공"); 
+			}else{ 
+				System.out.println("파일삭제 실패"); 
+				} 
+			}else{ 
+				System.out.println("파일이 존재하지 않습니다."); 
+			}
+
+		return 0;	
+	}
+	
 	private String getSaveLocation(MultipartHttpServletRequest request) {
+        String uploadPath = request.getSession().getServletContext().getRealPath("/");
+        String attachPath = "resources/file/";        
+        return uploadPath + attachPath;
+	}
+	
+	private String getSaveLocationDelete(HttpServletRequest request) {
         String uploadPath = request.getSession().getServletContext().getRealPath("/");
         String attachPath = "resources/file/";        
         return uploadPath + attachPath;

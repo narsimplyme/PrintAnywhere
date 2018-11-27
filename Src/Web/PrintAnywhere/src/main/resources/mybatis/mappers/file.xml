@@ -12,8 +12,8 @@
 	</resultMap>
 	<insert id="insertFile" parameterType="file">
 		<![CDATA[
-			insert into file (file_hash, file_name, file_type, user_id) 
-			values (#{fileHash},#{fileName},#{fileType},#{userId})
+			insert into file (file_hash, file_name, file_type, file_size, user_id) 
+			values (#{fileHash},#{fileName},#{fileType},#{fileSize}, #{userId})
 		]]>
 	</insert>
 	<select id="selectFileList" parameterType="file" resultMap="fileResult">
@@ -21,6 +21,9 @@
 	</select>
 	<select id="fileDownload" parameterType="int" resultType="string">
 		select file_hash from file where file_id = #{fileId}
+	</select>
+	<select id="selectFile" parameterType="int" resultMap="fileResult">
+		select * from file where file_id = #{fileId}
 	</select>
 	<delete id="deleteFile" parameterType="int">
 		DELETE FROM file WHERE file_id = #{fileId};

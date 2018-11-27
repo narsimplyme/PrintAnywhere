@@ -25,7 +25,7 @@ import com.capstone.service.UserService;
 import com.capstone.util.AuthToken;
 import com.capstone.util.Constants;
 import com.capstone.util.Response;
-import com.capstone.util.UploadFile;
+import com.capstone.util.FileUtil;
 
 @Controller
 public class FileController {
@@ -75,10 +75,13 @@ public class FileController {
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);
 		if(res.isSuccess()) {
+			File tempFile = fileService.selectFile(fileId);
 			int resCode = fileService.deleteFile(fileId);
 			if(resCode == Constants.DB_RES_CODE_7) {
 				res.setSuccess(true);
 				res.setMessage(Constants.MSG_CODE_200);
+				FileUtil fileUtil = new FileUtil();
+				fileUtil.deleteFile(request, tempFile);
 			}else {
 				res.setSuccess(false);
 				if(resCode == Constants.DB_RES_CODE_9) {
@@ -107,7 +110,7 @@ public class FileController {
 			res = AuthToken.isOk(authResult);
 			if(res.isSuccess()) {
 				for (int i = 0; i < fileList.size(); i++) {
-					UploadFile uf = new UploadFile();
+					FileUtil uf = new FileUtil();
 					File file = uf.uploadFile(session, request, fileList.get(i));
 					if(file == null) {
 						res.setSuccess(false);
@@ -144,7 +147,7 @@ public class FileController {
 			String savePath = uploadPath+attachPath+fileHash;
 			그냥 고정값 쓰는걸로
 			*/
-			data.put("fileUrl", "http://printaw.com/resources/file/"+fileHash);
+			data.put("fileUrl", Constants.SERVER_FILE_PATH +fileHash);
 	        res.setData(data);	
 	        res.setMessage(Constants.MSG_CODE_200);
 		}
@@ -181,7 +184,7 @@ public class FileController {
 			/*Token authResult = userService.isAuth(tokenId);
 			if(authResult != null) {*/
 				for (int i = 0; i < fileList.size(); i++) {
-					UploadFile uf = new UploadFile();
+					FileUtil uf = new FileUtil();
 					File file = uf.uploadFile(session, request, fileList.get(i));
 					if(file == null) {
 						res.setSuccess(false);

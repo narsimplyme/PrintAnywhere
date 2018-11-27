@@ -27,6 +27,7 @@ public class ClientService {
 	public List<Client> selectNearClient(float latitude, float longitude) {
 		ArrayList<DistMap> distMapArray = new ArrayList<>();
 		List<Client> clientArray = clientDao.selectClient();
+		System.out.println(clientArray.size());
 		List<Client> tempArray = new ArrayList<Client>();
 		for (int i = 0; i < clientArray.size(); i++) {
 			double cLat = Double.parseDouble(clientArray.get(i).getClientLatitude());
@@ -34,7 +35,7 @@ public class ClientService {
 			double dist = getDistance(latitude, longitude, cLat, cLon);
 			distMapArray.add(new DistMap(clientArray.get(i).getClientId(), dist));
 		}
-		clientArray = new ArrayList<Client>();
+		System.out.println(distMapArray.size());
 		distMapArray.sort(new Comparator<DistMap>() {
 
 			@Override

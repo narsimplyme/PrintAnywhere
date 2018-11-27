@@ -35,4 +35,8 @@ public class FileService {
 		return fileDao.fileDownload(fileId);
 	}
 
+	public File selectFile(int fileId) {
+		return fileDao.selectFile(fileId);
+	}
+
 }
