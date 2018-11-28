@@ -7,18 +7,22 @@ public class PrintLog {
 	private String printCount;
 	private String fileId;
 	private String userId;
+	private int printStartPoint;
+	private int printEndPoint;
 	
 	public PrintLog() {
 		super();
 	}
 	
-	public PrintLog(int printId, String clientId, String printCount, String fileId, String userId) {
+	public PrintLog(int printId, String clientId, String printCount, String fileId, String userId, int printStartPoint, int printEndPoint) {
 		super();
 		this.printId = printId;
 		this.clientId = clientId;
 		this.printCount = printCount;
 		this.fileId = fileId;
 		this.userId = userId;
+		this.printStartPoint = printStartPoint;
+		this.printEndPoint = printEndPoint;
 	}
 	
 	public int getPrintId() {
@@ -50,6 +54,21 @@ public class PrintLog {
 	}
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+	public int getPayStartPoint() {
+		return printStartPoint;
+	}
+
+	public void setPrintStartPoint(int printStartPoint) {
+		this.printStartPoint = printStartPoint;
+	}
+
+	public int getPrintEndPoint() {
+		return printEndPoint;
+	}
+
+	public void setPrintEndPoint(int printEndPoint) {
+		this.printEndPoint = printEndPoint;
 	}
 
 	@Override

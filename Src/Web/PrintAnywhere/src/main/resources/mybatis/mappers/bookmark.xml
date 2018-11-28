@@ -15,7 +15,7 @@
 		select * from bookmark
 	</select>
 	
-	<delete id="deleteBookMark">
-		DELETE FROM bookmark WHERE user_id = #{userId} and client_id = #{clientId};
+	<delete id="deleteBookMark" parameterType="bookmark">
+		DELETE FROM bookmark WHERE user_id = #{userId} and client_id = #{clientId}
 	</delete>
 </mapper>

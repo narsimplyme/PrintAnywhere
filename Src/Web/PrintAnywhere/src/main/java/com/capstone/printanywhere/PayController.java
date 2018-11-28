@@ -46,6 +46,7 @@ public class PayController {
 	public Response selectPayList (HttpServletRequest request, HttpServletResponse response, int startPoint, int endPoint) {
 		res = new Response();
 		data = new JSONObject();
+		
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);
@@ -62,6 +63,7 @@ public class PayController {
 	public Response insertPay (HttpServletRequest request, HttpServletResponse response, @RequestBody Pay pay) {
 		res = new Response();
 		data = new JSONObject();
+		
 		String tokenId = request.getHeader("x-access-token");
 		Token authResult = userService.isAuth(tokenId);
 		res = AuthToken.isOk(authResult);

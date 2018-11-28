@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.capstone.dto.Client;
+import com.capstone.util.Constants;
 
 @Repository
 public class ClientDao {
@@ -30,5 +31,17 @@ public class ClientDao {
 		} catch (PersistenceException e) {
 			return null;
 		}
+	}
+
+	public int updateClient(int clientId) {
+		try {
+			int count = sqlSession.update("client.updateClient", clientId);
+			if(count > 0) {
+				return Constants.DB_RES_CODE_5;
+			}
+		} catch (PersistenceException e) {
+			return Constants.DB_RES_CODE_9;
+		}
+		return Constants.DB_RES_CODE_6;
 	}
 }

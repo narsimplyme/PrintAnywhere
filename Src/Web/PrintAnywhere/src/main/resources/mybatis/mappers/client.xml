@@ -14,4 +14,10 @@
 	<select id="selectClient" resultMap="clientResult">
 	SELECT * FROM client
 	</select>
+	
+	<update id="updateClient" parameterType="int">
+		<![CDATA[
+			UPDATE client SET client_last_seen = now() WHERE (client_id = #{clientId})
+		]]>
+	</update>
 </mapper>

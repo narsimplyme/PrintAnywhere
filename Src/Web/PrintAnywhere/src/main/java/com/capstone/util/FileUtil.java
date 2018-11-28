@@ -36,6 +36,7 @@ public class FileUtil {
             out = new FileOutputStream(file);  
             byte[] bytes = uploadFile.getBytes();
             out.write(bytes);
+            System.out.println(filePath);
         }catch (Exception e) {
                 e.printStackTrace();
                 return null;

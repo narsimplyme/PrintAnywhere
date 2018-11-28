@@ -29,5 +29,16 @@ public class BookMark {
 		this.clientId = clientId;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BookMark [userId=");
+		builder.append(userId);
+		builder.append(", clientId=");
+		builder.append(clientId);
+		builder.append("]");
+		return builder.toString();
+	}
+	
 	
 }

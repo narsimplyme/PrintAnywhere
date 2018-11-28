@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="printlog">
+	<resultMap id="printlogResult" type="printlog">
+		<result property="printId" column="print_id"/>
+		<result property="clientId" column="client_id"/>
+		<result property="printCount" column="print_count"/>
+		<result property="fileId" column="file_id"/>
+		<result property="userId" column="user_id"/>
+	</resultMap>
+
+	<insert id="insertPrintLog" parameterType="printlog">
+		insert into pay (print_count, client_id, user_id, file_id) 
+		values (#{printCount}, #{clientId}, #{userId}, #{fileId})
+	</insert>
+	
+	<select id="selectPrintLogList" parameterType="printlog" resultMap="printlogResult">
+		select * from print_log where user_id = #{userId} order by pay_id limit #{printStartPoint}, #{printEndPoint} 
+	</select>
+</mapper>
