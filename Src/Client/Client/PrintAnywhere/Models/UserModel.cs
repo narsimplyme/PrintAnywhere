@@ -3,10 +3,11 @@ namespace PrintAnywhere.Models
 {
     public class UserModel
     {
-        public uint UserId { get; set; }
-
-        public string UserName { get; set; }
-
-        public string UserPwd { get; set; }
+        public string userId { get; set; }
+        public string userName { get; set; }
+        public string userNickName { get; set; }
+        public string userMail { get; set; }
+        public string userPhonenumber { get; set; }
+        public string userPoint { get; set; }
     }
 }

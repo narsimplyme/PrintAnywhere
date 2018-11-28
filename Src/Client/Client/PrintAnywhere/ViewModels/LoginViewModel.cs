@@ -1,10 +1,8 @@
-﻿using PrintAnywhere.Comm;
+﻿using Newtonsoft.Json;
+using PrintAnywhere.Comm;
 using PrintAnywhere.Models;
 using PrintAnywhere.Views;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -22,6 +20,8 @@ namespace PrintAnywhere.ViewModels
 
 
         private readonly Action _closeAction;
+
+        private string _jwt { get; set; }
 
 
         private CancellationTokenSource _cts;
@@ -172,21 +172,18 @@ namespace PrintAnywhere.ViewModels
             var progressIndicator = new Progress<int>(ReportProgress);
             _cts = new CancellationTokenSource();
 
-
-            Console.WriteLine("1");
+            
 
             try
             {
-                result = await ImplLogin(progressIndicator, _cts.Token);
+                result = await Login(progressIndicator, _cts.Token);
 
-
-                Console.WriteLine("2");
+                
             }
             catch (TaskCanceledException ex)
             {
                 ResultDescription = ex.Message;
-
-                Console.WriteLine("ex");
+                
             }
 
             catch (Exception ex)
@@ -200,12 +197,9 @@ namespace PrintAnywhere.ViewModels
 
             IsLogging = false;
 
-
-            Console.WriteLine("3");
-
+            
             if (result)
             {
-                Console.WriteLine("4");
                 ShowMainWindow();
             }
             else
@@ -219,92 +213,46 @@ namespace PrintAnywhere.ViewModels
         }
 
 
-        private async Task<bool> ImplLogin(IProgress<int> progress, CancellationToken ct)
+        private async Task<bool> Login(IProgress<int> progress, CancellationToken ct)
         {
             return await Task.Run(async () =>
             {
                 string uri = "http://xdkyu02.cafe24.com/signIn.do";
-                string uri2 = "http://xdkyu02.cafe24.com/signUp.do";
+                //string uri2 = "http://xdkyu02.cafe24.com/signUp.do";
+                //string uri3 = "http://xdkyu02.cafe24.com/jsonTest.do";
 
                 string json = new JavaScriptSerializer().Serialize(new
                 {
-                    userID = "merom",
-                    userPw = "123456",
+                    userId = _userName,
+                    userPw = _userPwd
                 });
 
-                //string requestJson = "{\"userId\":" + _userName + ", \"userPw\":" + _userPwd + "}";
 
                 using (var client = new HttpClient())
                 {
                     var response = await client.PostAsync(
                         uri,
                          new StringContent(json, Encoding.UTF8, "application/json"));
-                    Console.WriteLine(response);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonresult = response.Content.ReadAsStringAsync().Result;
+
+                        //deserialized 된 Json
+                        var jsonparse = JsonConvert.DeserializeObject<Response>(jsonresult);
+                        _jwt = jsonparse.ToString();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+
+                    }
                 }
 
-
-                //var request = (HttpWebRequest)WebRequest.Create(uri2);
-                //request.ContentType = "application/json";
-                //request.Method = "POST";
-
-                //using (var streamWriter = new StreamWriter(request.GetRequestStream()))
-                //{
-                //    string json = new JavaScriptSerializer().Serialize(new
-                //    {
-                //        userID = "merom",
-                //        userPw = "123456",
-                //        userPwConfirm = "123456",
-                //        userName = "Merom",
-                //        userNickName = "Merom",
-                //        userMail = "narsimplyme@naver.com",
-                //        userPhoneNumber="12345"
-                //    });
-
-                //    streamWriter.Write(json);
-                //}
-
-                //var response = (HttpWebResponse)request.GetResponse();
-                //using (var streamReader = new StreamReader(response.GetResponseStream()))
-                //{
-                //    var result = streamReader.ReadToEnd();
-                //    Console.WriteLine(result);
-                //}
-
-
-
-                var model = await GetUserInfoAsync(progress, ct);
-
-                if (!model.UserName.Equals("test", StringComparison.OrdinalIgnoreCase)
-                    || !UserPwd.Equals("test", StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("false");
-                    ResultDescription = "계정 정보 틀림！";
-                    return false;
-                }
-
-                ResultDescription = String.Empty;
-                Console.WriteLine("true");
-                return true;
             }, ct);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
 
-        private async Task<UserModel> GetUserInfoAsync(IProgress<int> progress, CancellationToken ct)
-        {
-            return await Task.Run(async () =>
-            {
-                for (var i = 0; i < 100; i++)
-                {
-                    await Task.Delay(10, ct);
-                    progress.Report(i);
-                }
-
-                return new UserModel { UserName = "test", UserPwd = "test" };
-            }, ct);
-        }
 
         /// <summary>
         /// 
@@ -351,15 +299,11 @@ namespace PrintAnywhere.ViewModels
         /// </summary>
         private void ShowMainWindow()
         {
-            var user = new UserModel
-            {
-                UserName = UserName,
-                UserPwd = UserPwd
-            };
+
 
             var winMain = new MainWindow();
             Application.Current.MainWindow = winMain;
-            winMain.DataContext = new MainWindowViewModel(_closeAction, user);
+            winMain.DataContext = new MainWindowViewModel(_closeAction, _jwt);
             _closeAction.Invoke();
             winMain.Show();
         }
