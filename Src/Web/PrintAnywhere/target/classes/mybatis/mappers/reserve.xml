@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reserve">
+	<resultMap id="reserveResult" type="reserve">
+		<result property="reserveId" column="reserve_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="fileId" column="file_id"/>
+		<result property="clientId" column="client_id"/>
+		<result property="reserveTime" column="reserve_time"/>
+	</resultMap>
+
+	<insert id="insertReserve" parameterType="reserve">
+		insert into reserve (user_id, file_id, client_id, reserve_time) 
+		values ( #{userId}, #{fileId}, #{clientId}, #{reserveTime})
+	</insert>
+	
+	<select id="selectReserveList" parameterType="string" resultMap="reserveResult">
+		<![CDATA[
+			SELECT * FROM reserve WHERE user_id = #{userId} AND reserve_time >= now()
+		]]>
+	</select>
+	
+	<select id="selectReserveList" parameterType="string" resultMap="reserveResult">
+		<![CDATA[
+			SELECT * FROM reserve WHERE client_id = #{clientId} AND reserve_time >= now()
+		]]>
+	</select>
+	
+	<update id="updateReserve" parameterType="reserve">
+		UPDATE reserve SET file_id = #{fileId}, client_id = #{clientId}, reserve_time = #{reserveTime} WHERE (reserve_id = #{reserveId});
+	</update>
+	
+	<delete id="deleteReserve" parameterType="int">
+		DELETE FROM reserve WHERE reserve_id = #{reserveId};
+	</delete>
+</mapper>

@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.capstone.dto.Client;
+import com.capstone.dto.Reserve;
 import com.capstone.dto.Token;
 import com.capstone.service.ClientService;
+import com.capstone.service.ReserveService;
 import com.capstone.service.UserService;
 import com.capstone.util.AuthToken;
 import com.capstone.util.Constants;
@@ -28,7 +30,8 @@ public class ClientController {
 	
 	private ClientService clientService;
 	private UserService userService;
-	
+	private ReserveService reserveService;
+
 	@Autowired
 	public void setUserService(UserService userService) {
 		this.userService = userService;
@@ -37,6 +40,10 @@ public class ClientController {
 	@Autowired
 	public void setClientService(ClientService clientService) {
 		this.clientService = clientService;
+	}
+	@Autowired
+	public void setReserveService(ReserveService reserveService) {
+		this.reserveService = reserveService;
 	}
 
 
@@ -63,4 +70,29 @@ public class ClientController {
 		}
 		return res;
 	}
+	
+	@RequestMapping(value = "reserveFileForClient.do",  method = RequestMethod.GET)
+	@ResponseBody
+	public Response reserveFileForClient(HttpServletRequest request, int clientId) {
+		res = new Response();
+		data = new JSONObject();
+		
+		int resCode = clientService.updateClient(clientId);
+		if(resCode == Constants.DB_RES_CODE_5) {
+			List<Reserve> reserveList = reserveService.reserveFileForClient(clientId);
+			data.put("reserveList", reserveList);
+			res.setData(data);
+			res.setMessage(Constants.MSG_CODE_200);
+			res.setSuccess(true);	
+		}else {
+			res.setSuccess(false);
+			if(resCode == Constants.DB_RES_CODE_9) 
+				res.setMessage(Constants.MSG_CODE_106);
+			else 
+				res.setMessage(Constants.MSG_CODE_304);
+		}
+		return res;
+	}
+	
+	
 }

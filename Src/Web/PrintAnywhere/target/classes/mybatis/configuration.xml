@@ -8,6 +8,8 @@
 		<typeAlias alias="pay" type="com.capstone.dto.Pay"/>
 		<typeAlias alias="client" type="com.capstone.dto.Client"/>
 		<typeAlias alias="bookmark" type="com.capstone.dto.BookMark"/>
+		<typeAlias alias="printlog" type="com.capstone.dto.PrintLog"/>
+		<typeAlias alias="reserve" type="com.capstone.dto.Reserve"/>
 	</typeAliases> 
 	<mappers>
     	<mapper resource="mybatis/mappers/user.xml"/>
@@ -16,5 +18,8 @@
        	<mapper resource="mybatis/mappers/pay.xml"/>
        	<mapper resource="mybatis/mappers/client.xml"/>
        	<mapper resource="mybatis/mappers/bookmark.xml"/>
+       	<mapper resource="mybatis/mappers/printlog.xml"/>
+      	<mapper resource="mybatis/mappers/reserve.xml"/>
+       	
 	</mappers>
 </configuration>

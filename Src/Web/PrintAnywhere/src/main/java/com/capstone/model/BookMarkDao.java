@@ -46,7 +46,7 @@ public class BookMarkDao {
 	public int deleteBookMark(String userId, int clientId) {
 		try {
 			BookMark bookMark = new BookMark(userId, clientId);
-			int count = sqlSession.delete("bookMark.deleteBookMark", bookMark);
+			int count = sqlSession.delete("bookmark.deleteBookMark", bookMark);
 			if(count > 0) {
 				return Constants.DB_RES_CODE_7;
 			}
