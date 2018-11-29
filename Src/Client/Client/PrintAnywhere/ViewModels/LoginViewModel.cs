@@ -3,6 +3,7 @@ using PrintAnywhere.Comm;
 using PrintAnywhere.Models;
 using PrintAnywhere.Views;
 using System;
+using System.Data;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -163,7 +164,6 @@ namespace PrintAnywhere.ViewModels
         /// </summary>
         private async void UserLogging()
         {
-            if (!VerifyUserInfoLocal()) return;
 
             IsLogging = true;
             IsShowResult = false;
@@ -172,18 +172,18 @@ namespace PrintAnywhere.ViewModels
             var progressIndicator = new Progress<int>(ReportProgress);
             _cts = new CancellationTokenSource();
 
-            
+
 
             try
             {
                 result = await Login(progressIndicator, _cts.Token);
 
-                
+
             }
             catch (TaskCanceledException ex)
             {
                 ResultDescription = ex.Message;
-                
+
             }
 
             catch (Exception ex)
@@ -197,7 +197,7 @@ namespace PrintAnywhere.ViewModels
 
             IsLogging = false;
 
-            
+
             if (result)
             {
                 ShowMainWindow();
@@ -218,8 +218,6 @@ namespace PrintAnywhere.ViewModels
             return await Task.Run(async () =>
             {
                 string uri = "http://xdkyu02.cafe24.com/signIn.do";
-                //string uri2 = "http://xdkyu02.cafe24.com/signUp.do";
-                //string uri3 = "http://xdkyu02.cafe24.com/jsonTest.do";
 
                 string json = new JavaScriptSerializer().Serialize(new
                 {
@@ -230,6 +228,7 @@ namespace PrintAnywhere.ViewModels
 
                 using (var client = new HttpClient())
                 {
+                    Console.WriteLine("httpclient");
                     var response = await client.PostAsync(
                         uri,
                          new StringContent(json, Encoding.UTF8, "application/json"));
@@ -238,9 +237,12 @@ namespace PrintAnywhere.ViewModels
                         var jsonresult = response.Content.ReadAsStringAsync().Result;
 
                         //deserialized 된 Json
-                        var jsonparse = JsonConvert.DeserializeObject<Response>(jsonresult);
+                        var jsonparse = JsonConvert.DeserializeObject<JwtResponse>(jsonresult);
+                        
                         _jwt = jsonparse.ToString();
-                        return true;
+
+                        if (_jwt != "") return true;
+                        else return false;
                     }
                     else
                     {
@@ -270,28 +272,6 @@ namespace PrintAnywhere.ViewModels
         {
             ResultDescription = String.Empty;
             IsShowResult = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private bool VerifyUserInfoLocal()
-        {
-            if (String.IsNullOrEmpty(UserName))
-            {
-                IsShowResult = true;
-                ResultDescription = "아이디를 입력해주세요!";
-                return false;
-            }
-
-            if (String.IsNullOrEmpty(UserPwd))
-            {
-                IsShowResult = true;
-                ResultDescription = "비밀번호를 입력해주세요!";
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

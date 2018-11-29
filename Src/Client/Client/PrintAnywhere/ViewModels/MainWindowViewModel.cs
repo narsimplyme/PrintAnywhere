@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Input;
@@ -23,28 +22,29 @@ namespace PrintAnywhere
 
 
         private readonly Action _closeAction;
-        private UserModel _user { get; set; }
+        private User _user { get; set; }
         public string _userName { get; private set; }
         public string _userPoint { get; private set; }
         private string _jwt;
+        public FileList[] _filelist;
 
 
         public MainWindowViewModel(Action closeAction, string _jwt)
         {
             this._closeAction = closeAction;
+            Items = new ObservableCollection<FileList>();
 
             this._jwt = _jwt;
 
             GetUserData();
 
+            GetFileData();
 
-
-            Items = new ObservableCollection<FileList>()
-                        {
-                            new FileList(213120,"File0.pdf","PDF",13123,"SSS"),
-                            new FileList(112312,"File2.pdf","PDF",13123,"SSS"),
-                            new FileList(123122,"File4.pdf","PDF",13123,"C:\\CAP.xml"),
-                        };
+            //            {
+            //                new FileList(213120,"File0.pdf","PDF",13123,"SSS"),
+            //                new FileList(112312,"File2.pdf","PDF",13123,"SSS"),
+            //                new FileList(123122,"File4.pdf","PDF",13123,"C:\\CAP.xml"),
+            //            };
 
             ShowSelectedCommand = new RelayCommand<IEnumerable<object>>(ShowSelected, CanShowSelected);
 
@@ -55,23 +55,22 @@ namespace PrintAnywhere
             Task.Run(async () =>
             {
                 string uri = "http://xdkyu02.cafe24.com/show.do";
-                //string uri2 = "http://xdkyu02.cafe24.com/signUp.do";
-                //string uri3 = "http://xdkyu02.cafe24.com/jsonTest.do";
 
-
-
+                Console.WriteLine(_jwt);
 
                 using (var client = new HttpClient())
                 {
-                    client.DefaultRequestHeaders.Add("x-auth-token", _jwt);
+                    client.DefaultRequestHeaders.Add("x-access-token", _jwt);
                     var response = await client.GetAsync(uri);
                     Console.WriteLine(response);
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonresult = response.Content.ReadAsStringAsync().Result;
-
+                        Console.WriteLine(jsonresult);
                         //deserialized 된 Json
-                        _user = JsonConvert.DeserializeObject<UserModel>(jsonresult);
+                        var jsonParse = JsonConvert.DeserializeObject<UserResponse>(jsonresult);
+
+                        _user = jsonParse.data.user;
                         _userName = _user.userName;
                         _userPoint = _user.userPoint;
                     }
@@ -85,7 +84,46 @@ namespace PrintAnywhere
             });
 
         }
+        public void GetFileData()
+        {
+            Task.Run(async () =>
+            {
+                string uri = "http://xdkyu02.cafe24.com/fileList.do?sizeOfList=10";
 
+
+
+                Console.WriteLine(_jwt);
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("x-access-token", _jwt);
+
+                    var response = await client.GetAsync(uri);
+                    Console.WriteLine(response);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonresult = response.Content.ReadAsStringAsync().Result;
+                        Console.WriteLine(jsonresult);
+                        //deserialized 된 Json
+                        var jsonParse = JsonConvert.DeserializeObject<FileResponse>(jsonresult);
+                        _filelist = jsonParse.data.fileList;
+
+                        foreach (FileList item in _filelist)
+                        {
+                            Items.Add(item);
+                        }
+
+                    }
+                    else
+                    {
+                        Logout();
+
+                    }
+                }
+
+            });
+
+        }
 
         public void Logout()
         {
@@ -99,24 +137,7 @@ namespace PrintAnywhere
                 StringWriter writer = new StringWriter();
                 foreach (FileList item in items)
                 {
-                    //writer.WriteLine(item.FileID);
-                    //ProcessStartInfo info = new ProcessStartInfo();
-                    //info.Verb = "print";
-                    //info.FileName = @"c:\ERD_1.3.pdf";
-                    //info.CreateNoWindow = true;
-                    //info.WindowStyle = ProcessWindowStyle.Hidden;
 
-                    //Process p = new Process();
-                    //p.StartInfo = info;
-                    //p.Start();
-
-                    //p.WaitForInputIdle();
-                    //System.Threading.Thread.Sleep(3000);
-                    //if (false == p.CloseMainWindow())
-                    //    p.Kill();
-
-                    //Pdf.PrintPDFs(@"c:\ERD_1.3.pdf");
-                    //Console.WriteLine("PDF");
                 }
                 string[] files = Directory.GetFiles(@"c:\");
                 foreach (string file in files.Where(
