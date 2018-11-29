@@ -24,7 +24,8 @@
           </div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="password" id="newPasswordConfirm" v-model="newPasswordConfirm" />
-            <label class="mdl-textfield__label" for="newPasswordConfirm">새 비밀번호 확인</label>
+            <label class="mdl-textfield__label" for="newPasswordConfirm" id="newPasswordConfirmLabel">새 비밀번호 확인</label>
+            <span class="mdl-textfield__error" id="newPasswordConfirmError" name="newPasswordConfirmError">비밀번호가 동일해야 합니다.</span>
           </div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="name" v-model="name" required/>
@@ -73,17 +74,23 @@ export default {
   methods: {
     onChangeProfile () {
       // requried
-      if (this.name === '' || this.nickName === '' || this.phone === '' || this.email === '' || this.password === '') {
+      if (this.name === '' || this.nickName === '' || this.phone === '' || this.email === '') {
         return
       }
       if (this.originPassword !== this.password) {
+        alert('기존 비밀번호를 입력해주십시오.')
         return
       }
       if (this.newPassword !== this.newPasswordConfirm) {
+        document.getElementById('newPasswordConfirmLabel').style.color = '#d50000'
+        document.getElementById('newPasswordConfirmError').style.visibility = 'visible'
         return
+      } else {
+        document.getElementById('newPasswordConfirmLabel').style.color = 'rgb(63,81,181)'
+        document.getElementById('newPasswordConfirmError').style.visibility = 'hidden'
       }
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.put('http://printaw.com/profile.do', {
+      axios.put('http://xdkyu02.cafe24.com/profile.do', {
         'userId': this.username,
         'userPw': this.password,
         'userName': this.name,
@@ -98,14 +105,17 @@ export default {
           'Content-Type': 'application/json'
         }
       }).then(response => {
-
+        alert('변경되었습니다.')
+        this.password = ''
+        this.newPassword = ''
+        this.newPasswordConfirm = ''
       }).catch(errors => {
 
       })
     },
     onAuthMe () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get('http://printaw.com/authMeFull.do', {
+      axios.get('http://xdkyu02.cafe24.com/authMeFull.do', {
         headers: {
           'x-access-token': token
         }
@@ -125,13 +135,13 @@ export default {
     },
     setAuth () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      if (token === '') {
+      if (token === '' || token === 'undefined') {
         this.auth = false
         this.$router.push('/')
         location.reload()
         return
       }
-      axios.get('http://printaw.com/authMe.do', {
+      axios.get('http://xdkyu02.cafe24.com/authMe.do', {
         headers: {
           'x-access-token': token
         }
@@ -150,7 +160,7 @@ export default {
     },
     refreshToken () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get('http://printaw.com/refresh.do', {
+      axios.get('http://xdkyu02.cafe24.com/refresh.do', {
         headers: {
           'x-access-token': token
         }

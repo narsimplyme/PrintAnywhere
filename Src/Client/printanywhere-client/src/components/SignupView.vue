@@ -75,7 +75,7 @@ export default {
       if (this.onCheckPassword() === false) {
         return
       }
-      axios.post('http://printaw.com/signUp.do', {
+      axios.post('http://xdkyu02.cafe24.com/signUp.do', {
         'userId': this.username,
         'userPw': this.password,
         'userName': this.name,
@@ -102,7 +102,7 @@ export default {
         this.auth = false
         return
       }
-      axios.get('http://printaw.com/authMe.do', {
+      axios.get('http://xdkyu02.cafe24.com/authMe.do', {
         headers: {
           'x-access-token': token
         }

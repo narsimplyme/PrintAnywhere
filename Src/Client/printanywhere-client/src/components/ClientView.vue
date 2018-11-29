@@ -1,29 +1,47 @@
 <template>
   <div class="mdl-layout__content mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone" v-if="auth">
-    <h1>Bookmark</h1>
-    <div v-for="client in this.bookmarkedClientlist" :key="client.id" v-bind:class="{'mdl-color--teal-100' : client.isWorking}" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
+    <div v-for="client in this.bookmarkedClientlist" :key="client.clientId" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
       <div class="mdl-card__title">
         <h2 class=mdl-card__title-text v-text="client.clientName"></h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <div>Latitude : <span v-text="client.clientLatitude"></span></div>
-        <div>Longitude : <span v-text="client.clientLongitude"></span></div>
+        <div>IP: <span v-text="client.clientIp"></span></div>
+        <div v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60">
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
+        </div>
+        <div v-else-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 1440">
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
+        </div>
+        <div v-else>
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
+        </div>
       </div>
-      <div class="mdl-card__actions mdl-card--border">
-        <a @click.native="onUnBookmark(client.id)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent ">UnBookmark</a>
+      <div class="mdl-card__menu">
+        <i v-on:click="onUnBookmark(client.clientId)" class="material-icons bookmark">favorite</i>
+        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">check_circle</i>
+        <i v-else class="material-icons off">check_circle_outline</i>
       </div>
     </div>
-    <h1>Near</h1>
-    <div v-for="client in this.nearClientlist" :key="client.id" v-bind:class="{'mdl-color--teal-100' : client.isWorking}" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
+    <div v-for="client in this.nearClientlist" :key="client.clientId" v-bind:class="{'mdl-color--teal-100' : client.isWorking}" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
       <div class="mdl-card__title">
         <h2 class=mdl-card__title-text v-text="client.clientName"></h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <div>Latitude : <span v-text="client.clientLatitude"></span></div>
-        <div>Longitude : <span v-text="client.clientLongitude"></span></div>
+        <div>IP: <span v-text="client.clientIp"></span></div>
+        <div v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60">
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
+        </div>
+        <div v-else-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 1440">
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
+        </div>
+        <div v-else>
+          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
+        </div>
       </div>
-      <div class="mdl-card__actions mdl-card--border">
-        <a @click.native="onBookmark(client.id)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored ">Bookmark</a>
+      <div class="mdl-card__menu">
+        <i v-on:click="onBookmark(client.clientId)" class="material-icons bookmark">favorite_border</i>
+        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">check_circle</i>
+        <i v-else class="material-icons off">check_circle_outline</i>
       </div>
     </div>
   </div>
@@ -32,26 +50,103 @@
 
 <script>
 import axios from 'axios'
-import clients from '../temp/clients'
 
 export default {
   data () {
     return {
       auth: false,
-      'bookmarkedClientlist': clients.bookmarkedClients,
-      'nearClientlist': clients.nearClients
+      username: '',
+      bookmarkedClientlist: [],
+      nearClientlist: [],
+      coordinates: ''
     }
   },
   methods: {
+    onUnBookmark (clientId) {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.delete('http://xdkyu02.cafe24.com/deleteBookMark.do', {
+        data: {
+          'clientId': clientId
+        },
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        location.reload()
+      }).catch(errors => {
+
+      })
+    },
+    onBookmark (clientId) {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.post('http://xdkyu02.cafe24.com/insertBookMark.do', {
+        'userId': this.username,
+        'clientId': clientId
+      },
+      {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        location.reload()
+      }).catch(errors => {
+
+      })
+    },
+    onSelectBookmarkList () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://xdkyu02.cafe24.com/selectBookMarkList.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        for (var i = 0; response.data.data.bookMarkList.length; i++) {
+          let client = this.nearClientlist.find(c => c.clientId === response.data.data.bookMarkList[i].clientId)
+          this.bookmarkedClientlist.push(client)
+          this.nearClientlist.splice(this.nearClientlist.indexOf(client), 1)
+        }
+      }).catch(errors => {
+
+      })
+    },
+    onGetGeolocation () {
+      this.$watchLocation(
+      ).then(coordinates => {
+        this.coordinates = coordinates
+        var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+        axios.get(`http://xdkyu02.cafe24.com/selectNearClient.do?latitude=${(this.coordinates.lat)}&longitude=${(this.coordinates.lng)}`, {
+          headers: {
+            'x-access-token': token
+          }
+        }).then(response => {
+          this.nearClientlist = response.data.data.nearClientList
+          this.onSelectBookmarkList()
+        }).catch(errors => {
+
+        })
+      }).catch(errors => {
+        var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+        axios.get(`http://xdkyu02.cafe24.com/selectNearClient.do?latitude=37.2222222&longitude=127.1879819000000007`, {
+          headers: {
+            'x-access-token': token
+          }
+        }).then(response => {
+          this.nearClientlist = response.data.data.nearClientList
+          this.onSelectBookmarkList()
+        }).catch(errors => {
+
+        })
+      })
+    },
     setAuth () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      if (token === '') {
+      if (token === '' || token === 'undefined') {
         this.auth = false
         this.$router.push('/')
         location.reload()
         return
       }
-      axios.get('http://printaw.com/authMe.do', {
+      axios.get('http://xdkyu02.cafe24.com/authMeFull.do', {
         headers: {
           'x-access-token': token
         }
@@ -60,6 +155,7 @@ export default {
           this.refreshToken()
         } else {
           this.auth = true
+          this.username = response.data.data.user.userId
         }
       }).catch(errors => {
         document.cookie = `accessToken=`
@@ -70,7 +166,7 @@ export default {
     },
     refreshToken () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get('http://printaw.com/refresh.do', {
+      axios.get('http://xdkyu02.cafe24.com/refresh.do', {
         headers: {
           'x-access-token': token
         }
@@ -87,11 +183,24 @@ export default {
   },
   beforeMount () {
     this.setAuth()
+    this.onGetGeolocation()
   }
 }
 </script>
 
 
 <style>
-
+.mdl-card__menu i{
+  font-size: 48px;
+  cursor: pointer;
+}
+.mdl-card__menu i.bookmark{
+  color: red;
+}
+.mdl-card__menu i.on{
+  color: steelblue;
+}
+.mdl-card__menu i.off{
+  color: slategray;
+}
 </style>

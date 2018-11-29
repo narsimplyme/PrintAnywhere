@@ -22,18 +22,51 @@
         <h2 class=mdl-card__title-text v-text="file.fileName"></h2>
       </div>
       <div class="mdl-card__supporting-text file-info">
-        <div>Size : <span v-text="file.fileSize"></span></div>
+        <div v-if="(file.fileSize < 1024)">Size : <span v-text="file.fileSize"></span> b</div>
+        <div v-else-if="(file.fileSize < 1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / 1024))"></span> kb</div>
+        <div v-else-if="(file.fileSize < 1024*1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / (1024*1024)))"></span> mb</div>
+        <div v-else-if="(file.fileSize < 1024*1024*1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024)))"></span> gb</div>
+        <div v-else>Size : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024*1024)))"></span> tb</div>
         <div>Uploaded : <span v-text="file.fileDate"></span></div>
       </div>
       <div class="mdl-card__actions mdl-card--border">
-        <button v-on:click="onReserve(file.fileId)" v-if="file.isReserved" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">UnReserve</button>
-        <button v-on:click="onUnReserve(file.fileId)" v-else class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
+        <button v-on:click="onUnReserve(file.reserveId)" v-if="file.isReserved" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">UnReserve</button>
+        <button v-on:click="onSetReserveFileId(file.fileId)" v-else class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
         <button v-on:click="onDelete(file.fileId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Delete</button>
       </div>
       <div class="mdl-card__menu">
         <i v-on:click="onDownload(file.fileId)" class="material-icons">cloud_download</i>
       </div>
     </div>
+    <modal name="reserve-modal-client" id="reserve-modal-client" height="auto" :scrollable="true" class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
+      <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone center-div">
+        <date-picker v-model="reserveTime" lang="kr" type="datetime" format="YYYY-MM-DD HH:mm:ss"></date-picker>
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
+          <thead>
+            <th>Client</th>
+            <th class="mdl-data-table__cell--non-numeric">Confirm</th>
+          </thead>
+          <tbody>
+            <tr v-for="client in this.bookmarkedClientlist" :key="client.clientId">
+              <td v-text="client.clientName">
+                <i class="material-icons bookmark">favorite</i>
+              </td>
+              <td class="mdl-data-table__cell--non-numeric">
+                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
+              </td>
+            </tr>
+            <tr v-for="client in this.nearClientlist" :key="client.clientId">
+              <td v-text="client.clientName">
+                <i class="material-icons bookmark">favorite_border</i>
+              </td>
+              <td class="mdl-data-table__cell--non-numeric">
+                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </modal>
   </div>
   <div class="mdl-layout__content" v-else>
     <img src="../assets/logo.png" alt="프린트애니웨어">
@@ -42,8 +75,12 @@
 </template>
 <script>
 import axios from 'axios'
+import DatePicker from 'vue2-datepicker'
 require('material-design-lite')
 export default {
+  components: {
+    DatePicker
+  },
   name: 'home',
   data () {
     return {
@@ -52,19 +89,88 @@ export default {
       auth: false,
       token: null,
       filelist: [],
-      uploadFileslist: []
+      uploadFileslist: [],
+      username: '',
+      bookmarkedClientlist: [],
+      nearClientlist: [],
+      coordinates: '',
+      reserveFileId: '',
+      reserveClientId: '',
+      reserveTime: ''
     }
   },
   methods: {
-    onReserve (fileId) {
-      // TODO api/files/{fileId} [PUT]
+    onShowReserveClientModal () {
+      this.$modal.show('reserve-modal-client')
     },
-    onUnReserve (fileId) {
-      // TODO api/files/{fileId} [PUT]
+    onSetReserveFileId (fileId) {
+      this.reserveFileId = fileId
+      this.onShowReserveClientModal()
+    },
+    onSetReserveClientId (clientId) {
+      this.reserveClientId = clientId
+      if (Math.floor(((new Date().getTime() - new Date(this.reserveTime).getTime()) / 1000)) < 0) {
+        this.onReserve()
+      } else {
+        alert('이전 시간은 선택할 수 없습니다.')
+      }
+    },
+    onReserve () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      let reserveDate = new Date(this.reserveTime)
+      axios.post('http://xdkyu02.cafe24.com/insertReserve.do', {
+        'userId': this.username,
+        'fileId': this.reserveFileId,
+        'clientId': this.reserveClientId,
+        'reserveTime': ((reserveDate.getFullYear() + '-' + ((reserveDate.getMonth() + 1) < 10 ? '0' + (reserveDate.getMonth() + 1) : (reserveDate.getMonth() + 1)) + '-' + (reserveDate.getDate() < 10 ? '0' + reserveDate.getDate() : reserveDate.getDate()) + ' ' + (reserveDate.getHours() < 10 ? '0' + reserveDate.getHours() : reserveDate.getHours()) + ':' + (reserveDate.getMinutes() < 10 ? '0' + reserveDate.getMinutes() : reserveDate.getMinutes()) + ':' + (reserveDate.getSeconds() < 10 ? '0' + reserveDate.getSeconds() : reserveDate.getSeconds())))
+      },
+      {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        this.$modal.hide('reserve-modal-client')
+        this.onGetFileList()
+        this.onGetReservedFile()
+      }).catch(errors => {
+
+      })
+    },
+    onGetReservedFile () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://xdkyu02.cafe24.com/selectReserveList.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        for (var i = 0; response.data.data.reserveList.length; i++) {
+          let file = this.filelist.find(f => f.fileId === response.data.data.reserveList[i].fileId)
+          file.isReserved = true
+          file.reserveId = response.data.data.reserveList.reserveId
+        }
+      }).catch(errors => {
+
+      })
+    },
+    onUnReserve (reserveId) {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.delete('http://xdkyu02.cafe24.com/deleteReserve.do', {
+        data: {
+          'reserveId': reserveId
+        },
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        this.onGetFileList()
+        this.onGetReservedFile()
+      }).catch(errors => {
+
+      })
     },
     onDelete (fileId) {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.delete('http://printaw.com/fileDelete.do', {
+      axios.delete('http://xdkyu02.cafe24.com/fileDelete.do', {
         data: {
           'fileId': fileId
         },
@@ -74,12 +180,24 @@ export default {
         }
       }).then(response => {
         this.onGetFileList()
+        this.onGetReservedFile()
       }).catch(errors => {
 
       })
     },
     onDownload (fildId) {
-      // TODO api/files/{fileId} [GET]
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get(`http://xdkyu02.cafe24.com/fileDonwload.do?fileId=${(fildId)}`, {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        let blob = new Blob([response.data.data])
+        let downurl = window.URL.createObjectURL(blob)
+        window.open(downurl)
+      }).catch(errors => {
+
+      })
     },
     onSubmitFiles () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
@@ -87,12 +205,13 @@ export default {
       for (var i = 0; i < this.uploadFileslist.length; i++) {
         uploadFile.append('uploadFile', this.uploadFileslist[i])
       }
-      axios.post('http://printaw.com/fileUpload.do', uploadFile, {
+      axios.post('http://xdkyu02.cafe24.com/fileUpload.do', uploadFile, {
         headers: {
           'x-access-token': token
         }
       }).then(response => {
         this.onGetFileList()
+        this.onGetReservedFile()
         this.uploadFileslist = []
       }).catch(errors => {
 
@@ -109,7 +228,7 @@ export default {
     },
     onGetFileList () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get('http://printaw.com/fileList.do?sizeOfList=10', {
+      axios.get('http://xdkyu02.cafe24.com/fileList.do?sizeOfList=10', {
         headers: {
           'x-access-token': token
         }
@@ -119,13 +238,58 @@ export default {
 
       })
     },
+    onSelectBookmarkList () {
+      var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+      axios.get('http://xdkyu02.cafe24.com/selectBookMarkList.do', {
+        headers: {
+          'x-access-token': token
+        }
+      }).then(response => {
+        for (var i = 0; response.data.data.bookMarkList.length; i++) {
+          let client = this.nearClientlist.find(c => c.clientId === response.data.data.bookMarkList[i].clientId)
+          this.bookmarkedClientlist.push(client)
+          this.nearClientlist.splice(this.nearClientlist.indexOf(client), 1)
+        }
+      }).catch(errors => {
+
+      })
+    },
+    onGetGeolocation () {
+      this.$watchLocation(
+      ).then(coordinates => {
+        this.coordinates = coordinates
+        var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+        axios.get(`http://xdkyu02.cafe24.com/selectNearClient.do?latitude=${(this.coordinates.lat)}&longitude=${(this.coordinates.lng)}`, {
+          headers: {
+            'x-access-token': token
+          }
+        }).then(response => {
+          this.nearClientlist = response.data.data.nearClientList
+          this.onSelectBookmarkList()
+        }).catch(errors => {
+
+        })
+      }).catch(errors => {
+        var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
+        axios.get(`http://xdkyu02.cafe24.com/selectNearClient.do?latitude=37.2222222&longitude=127.1879819000000007`, {
+          headers: {
+            'x-access-token': token
+          }
+        }).then(response => {
+          this.nearClientlist = response.data.data.nearClientList
+          this.onSelectBookmarkList()
+        }).catch(errors => {
+
+        })
+      })
+    },
     setAuth () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      if (token === '') {
+      if (token === '' || token === 'undefined') {
         this.auth = false
         return
       }
-      axios.get('http://printaw.com/authMe.do', {
+      axios.get('http://xdkyu02.cafe24.com/authMeFull.do', {
         headers: {
           'x-access-token': token
         }
@@ -134,6 +298,7 @@ export default {
           this.refreshToken()
         } else {
           this.auth = true
+          this.username = response.data.data.user.userId
         }
       }).catch(errors => {
         this.auth = false
@@ -141,7 +306,7 @@ export default {
     },
     refreshToken () {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get('http://printaw.com/refresh.do', {
+      axios.get('http://xdkyu02.cafe24.com/refresh.do', {
         headers: {
           'x-access-token': token
         }
@@ -156,6 +321,8 @@ export default {
   beforeMount () {
     this.setAuth()
     this.onGetFileList()
+    this.onGetReservedFile()
+    this.onGetGeolocation()
   }
 }
 </script>
@@ -185,5 +352,9 @@ div.uploadFile-listing{
 }
 div.file-info{
   min-height: 60px;
+}
+#reserve-modal-client{
+  margin-top: 60px;
+  margin-bottom: 60px;
 }
 </style>
