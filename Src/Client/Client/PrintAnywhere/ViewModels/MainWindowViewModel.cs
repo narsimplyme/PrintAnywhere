@@ -190,9 +190,50 @@ namespace PrintAnywhere
                 foreach (string file in files.Where(
                             file => file.ToUpper().Contains(".PDF")))
                 {
-                    Pdf.PrintPDFs(file);
+                    bool succ = Pdf.PrintPDFs(file);
+                    if (succ)
+                    {
+                        Task.Run(async () =>
+                        {
+                            string uri = "http://xdkyu02.cafe24.com/signIn.do";
+
+                            string json = new JavaScriptSerializer().Serialize(new
+                            {
+                                printCount = _userName,
+                                ClientId = _userPwd
+                                userId = 
+                                fileId = 
+                            });
+
+
+                            using (var client = new HttpClient())
+                            {
+                                Console.WriteLine("httpclient");
+                                var response = await client.PostAsync(
+                                    uri,
+                                     new StringContent(json, Encoding.UTF8, "application/json"));
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    var jsonresult = response.Content.ReadAsStringAsync().Result;
+
+                                    //deserialized 된 Json
+                                    var jsonparse = JsonConvert.DeserializeObject<JwtResponse>(jsonresult);
+
+                                    _jwt = jsonparse.ToString();
+
+                                    if (_jwt != "") return true;
+                                    else return false;
+                                }
+                                else
+                                {
+                                    return false;
+
+                                }
+                            }
+
+                        });
+                    }
                     Console.WriteLine("PDF");
-                    File.Delete(file);
                 }
 
                 //MessageBox.Show(writer.ToString());

@@ -10,15 +10,7 @@ namespace PrintAnywhere.Helper
 {
     class PDFHelper
     {
-        static void test(string[] args)
-        {
-            string[] files = Directory.GetFiles(@"c:\");
-            foreach (string file in files.Where(
-                        file => file.ToUpper().Contains(".PDF")))
-            {
-                Pdf.PrintPDFs(file);
-            }
-        }
+
     }//END Class
     public class Pdf
     {
@@ -49,6 +41,7 @@ namespace PrintAnywhere.Helper
 
                 proc.Close();
                 KillAdobe("AcroRd32");
+                File.Delete(pdfFileName);
                 return true;
             }
             catch
