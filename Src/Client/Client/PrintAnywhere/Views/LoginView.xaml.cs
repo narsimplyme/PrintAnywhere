@@ -1,13 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using GlowingWindow;
-using PrintAnywhere.Helper;
 using PrintAnywhere.ViewModels;
 
 namespace PrintAnywhere.Views
@@ -18,7 +12,6 @@ namespace PrintAnywhere.Views
         public LoginView()
         {
             InitializeComponent();
-
             DataContext = new LoginViewModel(() => Close());
             this.MouseLeftButtonDown += OnMouseLeftButtonDown;
         }
@@ -48,6 +41,7 @@ namespace PrintAnywhere.Views
         {
             this.Close();
         }
+
 
         private void Min_OnClick(object sender, RoutedEventArgs e)
         {

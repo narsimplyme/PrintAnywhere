@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -17,7 +18,9 @@ namespace PrintAnywhere
     public class MainWindowViewModel
     {
         public ObservableCollection<FileList> Items { get; private set; }
-        public ICommand ShowSelectedCommand { get; private set; }
+        public ICommand _Print { get; private set; }
+        public ICommand _RefreshFileList { get; private set; }
+        public ICommand _RefreshToken { get; private set; }
         private static readonly HttpClient client = new HttpClient();
 
 
@@ -40,15 +43,15 @@ namespace PrintAnywhere
 
             GetFileData();
 
-            //            {
-            //                new FileList(213120,"File0.pdf","PDF",13123,"SSS"),
-            //                new FileList(112312,"File2.pdf","PDF",13123,"SSS"),
-            //                new FileList(123122,"File4.pdf","PDF",13123,"C:\\CAP.xml"),
-            //            };
 
-            ShowSelectedCommand = new RelayCommand<IEnumerable<object>>(ShowSelected, CanShowSelected);
+
+            _Print = new RelayCommand<IEnumerable<object>>(PrintJob, CanShowSelected);
+            _RefreshFileList = new RelayCommand<IEnumerable<object>>(RefreshFileList, CanShowSelected);
+            _RefreshToken = new RelayCommand<IEnumerable<object>>(RefreshToken, CanShowSelected);
 
         }
+
+
         //todo
         public void GetUserData()
         {
@@ -116,7 +119,7 @@ namespace PrintAnywhere
                     }
                     else
                     {
-                        Logout();
+                       
 
                     }
                 }
@@ -124,33 +127,86 @@ namespace PrintAnywhere
             });
 
         }
+       
 
-        public void Logout()
+        private bool Logout()
         {
-            Console.WriteLine("Logout");
+            this._jwt = null;
+            this.Items.Clear();
+            if ((this._jwt == null) && this.Items.Count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        private void ShowSelected(IEnumerable<object> items)
+        private void PrintJob(IEnumerable<object> items)
         {
             if (items != null)
             {
                 StringWriter writer = new StringWriter();
                 foreach (FileList item in items)
                 {
+                    Task.Run(async () =>
+                    {
+                        string uri = "http://xdkyu02.cafe24.com/fileDownload.do?fileId=" + item.fileId.ToString();
 
+                        Console.WriteLine(_jwt);
+                        Console.WriteLine(uri);
+
+                        using (var client = new HttpClient())
+                        {
+                            client.DefaultRequestHeaders.Add("x-access-token", _jwt);
+
+                            var response = await client.GetAsync(uri);
+                            Console.WriteLine(response);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var jsonresult = response.Content.ReadAsStringAsync().Result;
+                                Console.WriteLine(jsonresult);
+                                //deserialized 된 Json
+                                var jsonParse = JsonConvert.DeserializeObject<DownloadResponse>(jsonresult);
+                                var fileUrl = jsonParse.data.fileUrl;
+                                using (var webclient = new WebClient())
+                                {
+                                    webclient.DownloadFile(fileUrl, "C:\\temp\\"+item.fileName);
+                                }
+
+
+                            }
+                            else
+                            {
+
+
+                            }
+                        }
+
+                    });
                 }
-                string[] files = Directory.GetFiles(@"c:\");
+                string[] files = Directory.GetFiles(@"c:\temp");
                 foreach (string file in files.Where(
                             file => file.ToUpper().Contains(".PDF")))
                 {
                     Pdf.PrintPDFs(file);
                     Console.WriteLine("PDF");
+                    File.Delete(file);
                 }
 
                 //MessageBox.Show(writer.ToString());
             }
         }
+        private void RefreshToken(IEnumerable<object> items)
+        {
 
+            Console.WriteLine("Refresh Token");
+        }
+        private void RefreshFileList(IEnumerable<object> items)
+        {
+            Console.WriteLine("Refresh File List");
+        }
         private bool CanShowSelected(IEnumerable<object> items)
         {
             return items != null && items.Count() > 0;

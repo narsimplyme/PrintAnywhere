@@ -122,7 +122,7 @@
             <TextBlock x:Name="UserID" Text="{Binding _userName}" Grid.Column="1" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
             <Image Grid.Column="2" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/pointIcon.png"/>
             <TextBlock x:Name="Point" Text="{Binding _userPoint}" Grid.Column="3" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
-            <Button Content="로그아웃" Grid.Column="4" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent"></Button>
+            <Button Content="로그아웃" Grid.Column="4" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Click="Button_Click"></Button>
 
 
         </Grid>
@@ -165,6 +165,12 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu DataContext="{Binding Path=PlacementTarget, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="Print" Command="{Binding Path=DataContext.Print}"
+                                  CommandParameter="{Binding Path=SelectedItems}"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Padding" Value="0"/>
@@ -191,12 +197,12 @@
 
         <!--submit-->
         <Grid Grid.Row="3" Grid.Column="1">
-            <Button Content="인쇄" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="0,2,0,0"/>
+            <Button Content="인쇄" Command="{Binding _Print, Mode=OneWay}" CommandParameter="{Binding SelectedItems, ElementName=listBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="0,2,0,0"/>
 
             <Button Content="미리보기" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="75,2,0,0"/>
-            <Button Content="로그인 연장" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="319,2,0,0"/>
-            <Button Content="파일삭제" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="150,2,0,0"/>
-            <Button Content="새로고침" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="244,2,0,0"/>
+            <Button Content="로그인 연장" Command="{Binding Path=_RefreshToken}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="319,2,0,0"/>
+            <Button Content="파일삭제" Command="{Binding Path=_DeleteFile}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="150,2,0,0"/>
+            <Button Content="새로고침" Command="{Binding Path=_RefreshFileList}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Margin="244,2,0,0"/>
 
             <!--<Button  Grid.ColumnSpan="2"
                      Margin="3,2,3,5"

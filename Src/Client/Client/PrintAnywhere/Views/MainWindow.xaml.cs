@@ -11,7 +11,7 @@ namespace PrintAnywhere.Views
         public MainWindow()
         {
             InitializeComponent();
-            //DataContext = new MainWindowViewModel(() => Close());
+            //DataContext = new MainWindowViewModel();
             this.MouseLeftButtonDown += OnMouseLeftButtonDown;
         }
 
@@ -31,6 +31,11 @@ namespace PrintAnywhere.Views
         private void Min_OnClick(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

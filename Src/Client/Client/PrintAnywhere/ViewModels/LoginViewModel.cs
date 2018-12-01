@@ -279,10 +279,10 @@ namespace PrintAnywhere.ViewModels
         /// </summary>
         private void ShowMainWindow()
         {
-
-
+            
             var winMain = new MainWindow();
             Application.Current.MainWindow = winMain;
+            
             winMain.DataContext = new MainWindowViewModel(_closeAction, _jwt);
             _closeAction.Invoke();
             winMain.Show();
