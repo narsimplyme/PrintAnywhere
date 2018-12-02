@@ -1,47 +1,53 @@
 <template>
   <div class="mdl-layout__content mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone" v-if="auth">
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text">즐겨찾기한 프린터</h2>
+    </div>
     <div v-for="client in this.bookmarkedClientlist" :key="client.clientId" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
       <div class="mdl-card__title">
-        <h2 class=mdl-card__title-text v-text="client.clientName"></h2>
+        <h2 class="mdl-card__title-text" v-text="client.clientName"></h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <div>IP: <span v-text="client.clientIp"></span></div>
+        <div>IP 주소 : <span v-text="client.clientIp"></span></div>
         <div v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60">
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
         </div>
         <div v-else-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 1440">
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
         </div>
         <div v-else>
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
         </div>
       </div>
       <div class="mdl-card__menu">
         <i v-on:click="onUnBookmark(client.clientId)" class="material-icons bookmark">favorite</i>
-        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">check_circle</i>
-        <i v-else class="material-icons off">check_circle_outline</i>
+        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">signal_cellular_4_bar</i>
+        <i v-else class="material-icons off">signal_cellular_off</i>
       </div>
+    </div>
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text">근처의 프린터</h2>
     </div>
     <div v-for="client in this.nearClientlist" :key="client.clientId" v-bind:class="{'mdl-color--teal-100' : client.isWorking}" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
       <div class="mdl-card__title">
-        <h2 class=mdl-card__title-text v-text="client.clientName"></h2>
+        <h2 class="mdl-card__title-text" v-text="client.clientName"></h2>
       </div>
       <div class="mdl-card__supporting-text">
-        <div>IP: <span v-text="client.clientIp"></span></div>
+        <div>IP 주소 : <span v-text="client.clientIp"></span></div>
         <div v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60">
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60)"></span> 분전</div>
         </div>
         <div v-else-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 1440">
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60))"></span> 시간전</div>
         </div>
         <div v-else>
-          <div>LastSeen: <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
+          <div>마지막으로 연결된 시간 : <span v-text="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/(60*60*24))"></span> 일전</div>
         </div>
       </div>
       <div class="mdl-card__menu">
         <i v-on:click="onBookmark(client.clientId)" class="material-icons bookmark">favorite_border</i>
-        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">check_circle</i>
-        <i v-else class="material-icons off">check_circle_outline</i>
+        <i v-if="Math.floor(((new Date().getTime() - new Date(client.clientLastSeen).getTime())/1000)/60) < 60" class="material-icons on">signal_cellular_4_bar</i>
+        <i v-else class="material-icons off">signal_cellular_off</i>
       </div>
     </div>
   </div>
@@ -198,9 +204,9 @@ export default {
   color: red;
 }
 .mdl-card__menu i.on{
-  color: steelblue;
+  color: rgb(49, 230, 25);
 }
 .mdl-card__menu i.off{
-  color: slategray;
+  color: rgb(230, 44, 31);
 }
 </style>

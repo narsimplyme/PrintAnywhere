@@ -2,7 +2,7 @@
   <main class="mdl-layout__content">
     <div class="mdl-card mdl-shadow--6dp">
       <div class="mdl-card__title">
-        <h2 class="mdl-card__title-text">Welcome</h2>
+        <h2 class="mdl-card__title-text">환영합니다!</h2>
       </div>
       <div class="mdl-card__supporting-text">
         <form @submit="onSignIn">
@@ -14,8 +14,10 @@
             <input class="mdl-textfield__input" type="password" id="password" v-model="password" />
             <label class="mdl-textfield__label" for="password">비밀번호</label>
           </div>
-          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">SignIn</button>
-          <router-link to="/signup" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">SignUp</router-link>
+          <div class="mdl-layout-spacer"></div>
+          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">로그인</button>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <router-link to="/signup" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">회원가입</router-link>
         </form>
       </div>
     </div>

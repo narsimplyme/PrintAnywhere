@@ -2,7 +2,7 @@
   <main class="mdl-layout__content">
     <div class="mdl-card mdl-shadow--6dp">
       <div class="mdl-card__title mdl-card--expand">
-        <h2 class="mdl-card__title-text">SingUp</h2>
+        <h2 class="mdl-card__title-text">회원가입</h2>
       </div>
       <div class="mdl-card__supporting-text">
         <div>
@@ -37,7 +37,7 @@
             <label class="mdl-textfield__label" for="email">이메일</label>
             <span class="mdl-textfield__error">올바른 이메일 형식을 입력해 주세요.</span>
           </div>
-          <button type="button" v-on:click="onSignUp ()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">SingUp</button>
+          <button type="button" v-on:click="onSignUp ()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">회원가입</button>
         </div>
       </div>
     </div>

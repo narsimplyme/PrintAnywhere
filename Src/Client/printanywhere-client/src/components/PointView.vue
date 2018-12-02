@@ -1,34 +1,34 @@
 <template>
   <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
-    <button v-on:click="onShowModal()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">Charge Point</button>
-    <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
+    <div class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--2-col-phone div-center">
+      <button v-on:click="onShowModal()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">포인트 충전하기</button>
+    </div>
+    <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--2-col-phone text-center div-center">
       <thead>
-        <th>Point</th>
-        <th class="mdl-data-table__cell--non-numeric">Date</th>
-        <th class="mdl-data-table__cell--non-numeric">Description</th>
+        <th>포인트</th>
+        <th class="mdl-data-table__cell--non-numeric">내역</th>
+        <th class="mdl-data-table__cell--non-numeric">날짜</th>
       </thead>
       <tbody>
         <tr v-for="point in this.pointlist" :key="point.payId">
           <td v-text="point.payCash"></td>
-          <td v-text="point.payDate" class="mdl-data-table__cell--non-numeric"></td>
           <td v-if="(point.payType == 1)" class="mdl-data-table__cell--non-numeric">포인트 충전</td>
+          <td v-text="(point.payDate.replace('.0',''))" class="mdl-data-table__cell--non-numeric"></td>
         </tr>
       </tbody>
     </table>
     <modal name="point-change-modal">
-      <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone center-div">
-        <div class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp mdl-grid--no-spacing">
-          <div class="mdl-card__title mdl-card--expand">
-            <h2 class="mdl-card__title-text">Charge Point</h2>
-          </div>
-          <div class="mdl-card__supporting-text">
-            <div>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="chargePoint" name="chargePoint" v-model="chargePoint" placeholder="포인트"/>
-              </div>
+      <div class="mdl-card mdl-cell mdl-cell--8-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone mdl-shadow--4dp mdl-grid--no-spacing div-center">
+        <div class="mdl-card__title mdl-card--expand">
+          <h2 class="mdl-card__title-text">포인트 충전</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+          <div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input" type="text" id="chargePoint" name="chargePoint" v-model="chargePoint" placeholder="포인트"/>
             </div>
-            <button v-on:click="onChargePoint()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Charge</button>
           </div>
+          <button v-on:click="onChargePoint()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">충전하기</button>
         </div>
       </div>
     </modal>
@@ -79,6 +79,7 @@ export default {
       }).then(response => {
         this.$modal.hide('point-change-modal')
         this.onGetPointList()
+        alert('포인트가 충전되었습니다.')
       }).catch(errors => {
 
       })
@@ -139,13 +140,20 @@ export default {
   color: #fff;
   background: url('../assets/point.png') bottom right 15% no-repeat #46B6AC;
 }
-.center-div{
-  width: calc(100%) !important;
-  margin: 0px !important;
+.text-center thead th {
+  text-align: center !important;
+}
+.text-center tbody tr td{
+  text-align: center !important;
 }
 .v--modal-box{
-  height: 350px !important;
+  left: 0px !important;
+  width: calc(100%) !important;
+  height: auto !important;
   background-color: transparent !important;
   box-shadow: 0 0 0 0 !important;
+}
+.div-center{
+  margin: 0 auto !important;
 }
 </style>

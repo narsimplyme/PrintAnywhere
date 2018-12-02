@@ -8,16 +8,16 @@
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">프린트애니웨어</span>
       <nav class="mdl-navigation" v-if="auth">
-        <router-link class="mdl-navigation__link" to="/" @click.native="hideMenu" replace>Home</router-link>
-        <router-link class="mdl-navigation__link" to="/profile" @click.native="hideMenu" replace>Profile</router-link>
-        <router-link class="mdl-navigation__link" to="/point" @click.native="hideMenu" replace>Point</router-link>
-        <router-link class="mdl-navigation__link" to="/client" @click.native="hideMenu" replace>Client</router-link>
-        <router-link class="mdl-navigation__link"  to="/" @click.native="unAuth" replace>Logout</router-link>
+        <router-link class="mdl-navigation__link" to="/" @click.native="hideMenu" replace>파일 업로드</router-link>
+        <router-link class="mdl-navigation__link" to="/profile" @click.native="hideMenu" replace>회원정보</router-link>
+        <router-link class="mdl-navigation__link" to="/point" @click.native="hideMenu" replace>포인트 충전</router-link>
+        <router-link class="mdl-navigation__link" to="/client" @click.native="hideMenu" replace>주변 프린터</router-link>
+        <router-link class="mdl-navigation__link"  to="/" @click.native="unAuth" replace>로그아웃</router-link>
       </nav>
       <nav class="mdl-navigation" v-else>
-        <router-link class="mdl-navigation__link" to="/" @click.native="hideMenu" replace>Home</router-link>
-        <router-link class="mdl-navigation__link" to="/signin" @click.native="hideMenu" replace>SignIn</router-link>
-        <router-link class="mdl-navigation__link" to="/signup" @click.native="hideMenu" replace>SignUp</router-link>
+        <router-link class="mdl-navigation__link" to="/" @click.native="hideMenu" replace>홈</router-link>
+        <router-link class="mdl-navigation__link" to="/signin" @click.native="hideMenu" replace>로그인</router-link>
+        <router-link class="mdl-navigation__link" to="/signup" @click.native="hideMenu" replace>회원가입</router-link>
       </nav>
     </div>
     <main class="mdl-layout__content">

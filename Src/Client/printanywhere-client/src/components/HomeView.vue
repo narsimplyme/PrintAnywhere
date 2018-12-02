@@ -4,17 +4,17 @@
       <div class="mdl-card__supporting-text uploadFile-listing">
         <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
           <div v-for="(uploadFile, index) in this.uploadFileslist" :key="index" class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" v-on:click="onRemoveFile( index )">Remove</button>
-            {{ uploadFile.name }}
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" v-on:click="onRemoveFile( index )">취소</button>&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ uploadFile.name }}</span>
           </div>
         </div>
       </div>
       <div class="mdl-card__actions mdl-card--border">
-        <label class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
-          Add Files
+        <label class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" :disabled="this.fileUploadProgress == true" >
+          업로드할 파일 선택
           <input type="file" ref="uploadFileInput" multiple v-on:change="onFileUpload()" />
         </label>
-        <button v-on:click="onSubmitFiles()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Upload Files</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button v-on:click="onSubmitFiles()" :disabled="this.fileUploadProgress == true" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">파일 업로드</button>
       </div>
     </div>
     <div v-for="file in this.filelist" :key="file.id" v-bind:class="{'mdl-color--teal-100' : file.isReserved}" class="mdl-card mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp">
@@ -22,45 +22,46 @@
         <h2 class=mdl-card__title-text v-text="file.fileName"></h2>
       </div>
       <div class="mdl-card__supporting-text file-info">
-        <div v-if="(file.fileSize < 1024)">Size : <span v-text="file.fileSize"></span> b</div>
-        <div v-else-if="(file.fileSize < 1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / 1024))"></span> kb</div>
-        <div v-else-if="(file.fileSize < 1024*1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / (1024*1024)))"></span> mb</div>
-        <div v-else-if="(file.fileSize < 1024*1024*1024*1024)">Size : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024)))"></span> gb</div>
-        <div v-else>Size : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024*1024)))"></span> tb</div>
-        <div>Uploaded : <span v-text="file.fileDate"></span></div>
+        <div v-if="(file.fileSize < 1024)">파일 크기 : <span v-text="file.fileSize"></span> b</div>
+        <div v-else-if="(file.fileSize < 1024*1024)">파일 크기 : <span v-text="(Math.floor(file.fileSize / 1024))"></span> kb</div>
+        <div v-else-if="(file.fileSize < 1024*1024*1024)">파일 크기 : <span v-text="(Math.floor(file.fileSize / (1024*1024)))"></span> mb</div>
+        <div v-else-if="(file.fileSize < 1024*1024*1024*1024)">파일 크기 : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024)))"></span> gb</div>
+        <div v-else>파일 크기 : <span v-text="(Math.floor(file.fileSize / (1024*1024*1024*1024)))"></span> tb</div>
+        <div>업로드 시간 : <span v-text="(file.fileDate.replace('.0', ''))"></span></div>
       </div>
       <div class="mdl-card__actions mdl-card--border">
-        <button v-on:click="onUnReserve(file.reserveId)" v-if="file.isReserved" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">UnReserve</button>
-        <button v-on:click="onSetReserveFileId(file.fileId)" v-else class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
-        <button v-on:click="onDelete(file.fileId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Delete</button>
+        <button v-on:click="onUnReserve(file.reserveId)" v-if="file.isReserved" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">예약취소</button>
+        <button v-on:click="onSetReserveFileId(file.fileId)" v-else class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">예약하기</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button v-on:click="onDelete(file.fileId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">파일삭제</button>
       </div>
       <div class="mdl-card__menu">
-        <i v-on:click="onDownload(file.fileId)" class="material-icons">cloud_download</i>
+        <i v-on:click="onDownload(file.fileId, file.fileName)" class="material-icons">cloud_download</i>
       </div>
     </div>
-    <modal name="reserve-modal-client" id="reserve-modal-client" height="auto" :scrollable="true" class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
-      <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone center-div">
-        <date-picker v-model="reserveTime" lang="kr" type="datetime" format="YYYY-MM-DD HH:mm:ss"></date-picker>
-        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
-          <thead>
-            <th>Client</th>
-            <th class="mdl-data-table__cell--non-numeric">Confirm</th>
+    <modal name="reserve-modal-client" :scrollable="true">
+      <div class="mdl-card mdl-cell mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone mdl-shadow--4dp div-center">
+        <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
+          <date-picker v-model="reserveTime" lang="kr" type="datetime" format="YYYY-MM-DD HH:mm:ss"></date-picker>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-grid--no-spacing mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--4-col-phone">
+          <thead class="client-list">
+            <th class="mdl-data-table__cell--non-numeric">예약하기</th>
+            <th class="text-align-left">주변 프린터</th>
           </thead>
           <tbody>
             <tr v-for="client in this.bookmarkedClientlist" :key="client.clientId">
-              <td v-text="client.clientName">
-                <i class="material-icons bookmark">favorite</i>
-              </td>
               <td class="mdl-data-table__cell--non-numeric">
-                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
+                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">예약하기</button>
+              </td>
+              <td v-text="client.clientName" class="text-align-left">
               </td>
             </tr>
             <tr v-for="client in this.nearClientlist" :key="client.clientId">
-              <td v-text="client.clientName">
-                <i class="material-icons bookmark">favorite_border</i>
-              </td>
               <td class="mdl-data-table__cell--non-numeric">
-                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Reserve</button>
+                <button v-on:click="onSetReserveClientId(client.clientId)" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">예약하기</button>
+              </td>
+              <td v-text="client.clientName" class="text-align-left">
               </td>
             </tr>
           </tbody>
@@ -68,14 +69,25 @@
       </div>
     </modal>
   </div>
-  <div class="mdl-layout__content" v-else>
-    <img src="../assets/logo.png" alt="프린트애니웨어">
-    <h1 v-text='msg'></h1>
+  <div v-else>
+    <video :poster="poster" autoplay muted playsinline loop class="background-vid">
+      <source :src="videoSrcWebm" type="video/webm" />
+      <source :src="videoSrcMp4" type="video/mp4">
+      <source :src="videoSrcOgg" type="video/ogg">
+    </video>
+    <div class="text-overlay">
+      <h1><img src="../assets/logo.png" alt="프린트애니웨어"></h1>
+      <h2>프린트애니웨어는 공용 프린터를 손쉽게 이용할 수 있도록 맞춤 서비스를 제공합니다.</h2>
+  </div>
   </div>
 </template>
 <script>
 import axios from 'axios'
 import DatePicker from 'vue2-datepicker'
+import backgroundVideo from '../assets/1.mp4'
+import backgroundVideoWebm from '../assets/1.webm'
+import backgroundVideoOgg from '../assets/1.ogg'
+import backgroundPoster from '../assets/poster.png'
 require('material-design-lite')
 export default {
   components: {
@@ -84,9 +96,7 @@ export default {
   name: 'home',
   data () {
     return {
-      msg: '프린트애니웨어에 오신걸 환영합니다.',
-      welcome: '님 환영합니다.',
-      auth: false,
+      auth: '',
       token: null,
       filelist: [],
       uploadFileslist: [],
@@ -96,7 +106,12 @@ export default {
       coordinates: '',
       reserveFileId: '',
       reserveClientId: '',
-      reserveTime: ''
+      reserveTime: '',
+      fileUploadProgress: false,
+      videoSrcMp4: backgroundVideo,
+      videoSrcWebm: backgroundVideoWebm,
+      videoSrcOgg: backgroundVideoOgg,
+      poster: backgroundPoster
     }
   },
   methods: {
@@ -132,6 +147,8 @@ export default {
         this.$modal.hide('reserve-modal-client')
         this.onGetFileList()
         this.onGetReservedFile()
+        this.onGetGeolocation()
+        alert('예약이 완료되었습니다.')
       }).catch(errors => {
 
       })
@@ -146,7 +163,7 @@ export default {
         for (var i = 0; response.data.data.reserveList.length; i++) {
           let file = this.filelist.find(f => f.fileId === response.data.data.reserveList[i].fileId)
           file.isReserved = true
-          file.reserveId = response.data.data.reserveList.reserveId
+          file.reserveId = response.data.data.reserveList[i].reserveId
         }
       }).catch(errors => {
 
@@ -164,6 +181,8 @@ export default {
       }).then(response => {
         this.onGetFileList()
         this.onGetReservedFile()
+        this.onGetGeolocation()
+        alert('예약이 취소되었습니다.')
       }).catch(errors => {
 
       })
@@ -181,22 +200,35 @@ export default {
       }).then(response => {
         this.onGetFileList()
         this.onGetReservedFile()
+        this.onGetGeolocation()
+        alert('파일이 삭제되었습니다.')
       }).catch(errors => {
 
       })
     },
-    onDownload (fildId) {
+    onDownload (fildId, fileName) {
       var token = document.cookie.match('(^|;) ?' + 'accessToken' + '=([^;]*)(;|$)')[2]
-      axios.get(`http://xdkyu02.cafe24.com/fileDonwload.do?fileId=${(fildId)}`, {
+      axios.get(`http://xdkyu02.cafe24.com/fileDownload.do?fileId=${(fildId)}`, {
         headers: {
           'x-access-token': token
         }
       }).then(response => {
-        let blob = new Blob([response.data.data])
-        let downurl = window.URL.createObjectURL(blob)
-        window.open(downurl)
+        this.onFileDonwload(response.data.data.fileUrl, fileName)
       }).catch(errors => {
 
+      })
+    },
+    onFileDonwload (url, fileName) {
+      axios.get(url, {
+        responseType: 'blob'
+      }).then(response => {
+        let link = document.createElement('a')
+        link.href = window.URL.createObjectURL(new Blob([response.data]))
+        link.setAttribute('download', fileName)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
       })
     },
     onSubmitFiles () {
@@ -205,6 +237,7 @@ export default {
       for (var i = 0; i < this.uploadFileslist.length; i++) {
         uploadFile.append('uploadFile', this.uploadFileslist[i])
       }
+      this.fileUploadProgress = true
       axios.post('http://xdkyu02.cafe24.com/fileUpload.do', uploadFile, {
         headers: {
           'x-access-token': token
@@ -212,7 +245,10 @@ export default {
       }).then(response => {
         this.onGetFileList()
         this.onGetReservedFile()
+        this.onGetGeolocation()
         this.uploadFileslist = []
+        this.fileUploadProgress = false
+        alert('파일이 업로드되었습니다.')
       }).catch(errors => {
 
       })
@@ -353,8 +389,49 @@ div.uploadFile-listing{
 div.file-info{
   min-height: 60px;
 }
-#reserve-modal-client{
-  margin-top: 60px;
-  margin-bottom: 60px;
+.v--modal-box{
+  left: 0px !important;
+  width: calc(100%) !important;
+  height: auto !important;
+  background-color: transparent !important;
+  box-shadow: 0 0 0 0 !important;
+}
+.div-center{
+  margin: 0 auto !important;
+}
+.text-align-left{
+  text-align: left !important;
+}
+.background-vid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+       -moz-transform: translateX(-50%) translateY(-50%);
+        -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    background-size: cover;
+}
+.text-overlay {
+  font-weight:100;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  padding: 2rem;
+  margin: 2rem;
+  width: auto;
+  min-height: 410px;
+}
+.text-overlay h1 {
+  color: #fff;
+  font-size: 38px;
+}
+.text-overlay h2 {
+  font-size: 28px;
+  color: #fff;
 }
 </style>
