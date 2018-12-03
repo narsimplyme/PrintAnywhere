@@ -6,6 +6,7 @@ using PrintAnywhere.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,7 +14,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
-using System.Windows;
 using System.Windows.Input;
 
 namespace PrintAnywhere
@@ -21,6 +21,7 @@ namespace PrintAnywhere
     public class MainWindowViewModel
     {
         public ObservableCollection<FileList> Items { get; private set; }
+        public ObservableCollection<User> _userObservable { get; private set; }
         public ICommand _Print { get; private set; }
         public ICommand _RefreshFileList { get; private set; }
         public ICommand _RefreshToken { get; private set; }
@@ -33,12 +34,32 @@ namespace PrintAnywhere
         public string _userPoint { get; private set; }
         private string _jwt;
         public FileList[] _filelist;
+        public string userName
+        {
+            get { return _userName; }
+            set { _userName = value; NotifyPropertyChanged("userName"); }
+        }
+        public string userPoint
+        {
+            get { return _userPoint; }
+            set { _userPoint = value; NotifyPropertyChanged("userPoint"); }
+        }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (null != handler)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public MainWindowViewModel(Action closeAction, string _jwt)
         {
             this._closeAction = closeAction;
             Items = new ObservableCollection<FileList>();
+            _userObservable = new ObservableCollection<User>();
 
             this._jwt = _jwt;
 
@@ -60,33 +81,32 @@ namespace PrintAnywhere
         {
             Task.Run(async () =>
             {
-            string uri = "http://xdkyu02.cafe24.com/show.do";
+                string uri = "http://xdkyu02.cafe24.com/show.do";
 
-            Console.WriteLine(_jwt);
+                Console.WriteLine(_jwt);
 
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("x-access-token", _jwt);
-                var response = await client.GetAsync(uri);
-                Console.WriteLine(response);
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var jsonresult = response.Content.ReadAsStringAsync().Result;
-                    Console.WriteLine(jsonresult);
+                    client.DefaultRequestHeaders.Add("x-access-token", _jwt);
+                    var response = await client.GetAsync(uri);
+                    Console.WriteLine(response);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonresult = response.Content.ReadAsStringAsync().Result;
+                        Console.WriteLine(jsonresult);
 
 
-                    var jsonParse = JsonConvert.DeserializeObject<UserResponse>(jsonresult);
+                        var jsonParse = JsonConvert.DeserializeObject<UserResponse>(jsonresult);
 
-                    _user = jsonParse.data.user;
-                    _userName = _user.userName;
-                    _userPoint = _user.userPoint;
-                        App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                        {
-                            _userName = _user.userName;
-                            _userPoint = _user.userPoint;
-                        });
-                        Console.WriteLine(_userName);
-                        Console.WriteLine(_userPoint);
+                        _user = jsonParse.data.user;
+                        _userName = _user.userName;
+                        _userPoint = _user.userPoint;
+
+                        userName = _user.userName;
+                        userPoint = _user.userPoint;
+
+                        Console.WriteLine(userName);
+                        Console.WriteLine(userPoint);
                     }
                     else
                     {
@@ -129,8 +149,8 @@ namespace PrintAnywhere
                             App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                             {
                                 Items.Add(item);
-                                _userName = _user.userName;
-                                _userPoint = _user.userPoint;
+                                userName = _user.userName;
+                                userPoint = _user.userPoint;
                             });
                             //Console.WriteLine(item.fileId);
                             //Items.Add(item);
@@ -192,23 +212,23 @@ namespace PrintAnywhere
                                 var fileUrl = jsonParse.data.fileUrl;
                                 using (var webclient = new WebClient())
                                 {
-                                    webclient.DownloadFile(fileUrl, "C:\\temp\\" + item.fileId+ ".pdf");
+                                    webclient.DownloadFile(fileUrl, "C:\\temp\\" + item.fileId + ".pdf");
                                     bool succ = Pdf.PrintPDFs("C:\\temp\\" + item.fileId + ".pdf");
                                     if (succ)
                                     {
 
-                                            PdfReader pdfReader = new PdfReader("C:\\temp\\" + item.fileId + ".pdf");
-                                            int numberOfPages = pdfReader.NumberOfPages;
+                                        PdfReader pdfReader = new PdfReader("C:\\temp\\" + item.fileId + ".pdf");
+                                        int numberOfPages = pdfReader.NumberOfPages;
 
-                                            string uri2 = "http://xdkyu02.cafe24.com/insertPrintLog.do";
+                                        string uri2 = "http://xdkyu02.cafe24.com/insertPrintLog.do";
 
-                                            string json = new JavaScriptSerializer().Serialize(new
-                                            {
-                                                printCount = numberOfPages,
-                                                ClientId = 1,
-                                                userId = _user.userId,
-                                                fileId = item.fileId
-                                            });
+                                        string json = new JavaScriptSerializer().Serialize(new
+                                        {
+                                            printCount = numberOfPages,
+                                            ClientId = 1,
+                                            userId = _user.userId,
+                                            fileId = item.fileId
+                                        });
 
                                         await Task.Run(async () =>
                                         {
