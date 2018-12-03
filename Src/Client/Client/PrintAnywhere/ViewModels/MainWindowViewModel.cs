@@ -1,4 +1,5 @@
-﻿using MvvmFoundation.Wpf;
+﻿using iTextSharp.text.pdf;
+using MvvmFoundation.Wpf;
 using Newtonsoft.Json;
 using PrintAnywhere.Helper;
 using PrintAnywhere.Models;
@@ -9,8 +10,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PrintAnywhere
@@ -57,25 +60,33 @@ namespace PrintAnywhere
         {
             Task.Run(async () =>
             {
-                string uri = "http://xdkyu02.cafe24.com/show.do";
+            string uri = "http://xdkyu02.cafe24.com/show.do";
 
-                Console.WriteLine(_jwt);
+            Console.WriteLine(_jwt);
 
-                using (var client = new HttpClient())
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("x-access-token", _jwt);
+                var response = await client.GetAsync(uri);
+                Console.WriteLine(response);
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Add("x-access-token", _jwt);
-                    var response = await client.GetAsync(uri);
-                    Console.WriteLine(response);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonresult = response.Content.ReadAsStringAsync().Result;
-                        Console.WriteLine(jsonresult);
-                        //deserialized 된 Json
-                        var jsonParse = JsonConvert.DeserializeObject<UserResponse>(jsonresult);
+                    var jsonresult = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine(jsonresult);
 
-                        _user = jsonParse.data.user;
-                        _userName = _user.userName;
-                        _userPoint = _user.userPoint;
+
+                    var jsonParse = JsonConvert.DeserializeObject<UserResponse>(jsonresult);
+
+                    _user = jsonParse.data.user;
+                    _userName = _user.userName;
+                    _userPoint = _user.userPoint;
+                        App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                        {
+                            _userName = _user.userName;
+                            _userPoint = _user.userPoint;
+                        });
+                        Console.WriteLine(_userName);
+                        Console.WriteLine(_userPoint);
                     }
                     else
                     {
@@ -91,7 +102,7 @@ namespace PrintAnywhere
         {
             Task.Run(async () =>
             {
-                string uri = "http://xdkyu02.cafe24.com/fileList.do?sizeOfList=10";
+                string uri = "http://xdkyu02.cafe24.com/fileList.do?sizeOfList=20";
 
 
 
@@ -107,19 +118,28 @@ namespace PrintAnywhere
                     {
                         var jsonresult = response.Content.ReadAsStringAsync().Result;
                         Console.WriteLine(jsonresult);
-                        //deserialized 된 Json
+
+
                         var jsonParse = JsonConvert.DeserializeObject<FileResponse>(jsonresult);
                         _filelist = jsonParse.data.fileList;
+                        //Console.WriteLine(_filelist);
 
                         foreach (FileList item in _filelist)
                         {
-                            Items.Add(item);
+                            App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                            {
+                                Items.Add(item);
+                                _userName = _user.userName;
+                                _userPoint = _user.userPoint;
+                            });
+                            //Console.WriteLine(item.fileId);
+                            //Items.Add(item);
                         }
 
                     }
                     else
                     {
-                       
+
 
                     }
                 }
@@ -127,7 +147,7 @@ namespace PrintAnywhere
             });
 
         }
-       
+
 
         private bool Logout()
         {
@@ -172,7 +192,50 @@ namespace PrintAnywhere
                                 var fileUrl = jsonParse.data.fileUrl;
                                 using (var webclient = new WebClient())
                                 {
-                                    webclient.DownloadFile(fileUrl, "C:\\temp\\"+item.fileName);
+                                    webclient.DownloadFile(fileUrl, "C:\\temp\\" + item.fileId+ ".pdf");
+                                    bool succ = Pdf.PrintPDFs("C:\\temp\\" + item.fileId + ".pdf");
+                                    if (succ)
+                                    {
+
+                                            PdfReader pdfReader = new PdfReader("C:\\temp\\" + item.fileId + ".pdf");
+                                            int numberOfPages = pdfReader.NumberOfPages;
+
+                                            string uri2 = "http://xdkyu02.cafe24.com/insertPrintLog.do";
+
+                                            string json = new JavaScriptSerializer().Serialize(new
+                                            {
+                                                printCount = numberOfPages,
+                                                ClientId = 1,
+                                                userId = _user.userId,
+                                                fileId = item.fileId
+                                            });
+
+                                        await Task.Run(async () =>
+                                        {
+                                            using (var client2 = new HttpClient())
+                                            {
+
+                                                client.DefaultRequestHeaders.Add("x-access-token", _jwt);
+                                                var response2 = await client.PostAsync(
+                                                    uri2,
+                                                     new StringContent(json, Encoding.UTF8, "application/json"));
+                                                if (response.IsSuccessStatusCode)
+                                                {
+                                                    var jsonresult2 = response.Content.ReadAsStringAsync().Result;
+
+
+                                                    return true;
+                                                    //else return false;
+                                                }
+                                                else
+                                                {
+                                                    return false;
+
+                                                }
+                                            }
+
+                                        });
+                                    }
                                 }
 
 
@@ -190,53 +253,9 @@ namespace PrintAnywhere
                 foreach (string file in files.Where(
                             file => file.ToUpper().Contains(".PDF")))
                 {
-                    bool succ = Pdf.PrintPDFs(file);
-                    if (succ)
-                    {
-                        Task.Run(async () =>
-                        {
-                            string uri = "http://xdkyu02.cafe24.com/signIn.do";
 
-                            string json = new JavaScriptSerializer().Serialize(new
-                            {
-                                printCount = _userName,
-                                ClientId = _userPwd
-                                userId = 
-                                fileId = 
-                            });
-
-
-                            using (var client = new HttpClient())
-                            {
-                                Console.WriteLine("httpclient");
-                                var response = await client.PostAsync(
-                                    uri,
-                                     new StringContent(json, Encoding.UTF8, "application/json"));
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    var jsonresult = response.Content.ReadAsStringAsync().Result;
-
-                                    //deserialized 된 Json
-                                    var jsonparse = JsonConvert.DeserializeObject<JwtResponse>(jsonresult);
-
-                                    _jwt = jsonparse.ToString();
-
-                                    if (_jwt != "") return true;
-                                    else return false;
-                                }
-                                else
-                                {
-                                    return false;
-
-                                }
-                            }
-
-                        });
-                    }
-                    Console.WriteLine("PDF");
                 }
 
-                //MessageBox.Show(writer.ToString());
             }
         }
         private void RefreshToken(IEnumerable<object> items)

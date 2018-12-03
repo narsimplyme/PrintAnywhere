@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PeterKottas.DotNetCore.WindowsService\PeterKottas.DotNetCore.WindowsService.csproj" />
+    <ProjectReference Include="..\PrintAnywhere\PrintAnywhere.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -119,9 +119,9 @@
             </Grid.ColumnDefinitions>
 
             <Image Grid.Column="0" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/userIcon.png"/>
-            <TextBlock x:Name="UserID" Text="{Binding _userName}" Grid.Column="1" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
+            <TextBlock x:Name="UserID" Text="{Binding _userName}" Grid.Column="1" HorizontalAlignment="Center" Height="25" TextWrapping="Wrap" VerticalAlignment="Center" Width="110" Margin="4,4,10,4" Grid.ColumnSpan="2"/>
             <Image Grid.Column="2" HorizontalAlignment="Center" Height="25" VerticalAlignment="Center" Width="25" Source="/PrintAnywhere;component/Resource/pointIcon.png"/>
-            <TextBlock x:Name="Point" Text="{Binding _userPoint}" Grid.Column="3" HorizontalAlignment="Center" Height="20" TextWrapping="Wrap" VerticalAlignment="Center" Width="90" Margin="0,13,0,0"/>
+            <TextBlock x:Name="Point" Text="{Binding _userPoint}" Grid.Column="3" HorizontalAlignment="Center" Height="25" TextWrapping="Wrap" VerticalAlignment="Center" Width="121" Margin="0,4,113,4" Grid.ColumnSpan="2"/>
             <Button Content="로그아웃" Grid.Column="4" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Top" Width="75" Height="33" BorderThickness="0" Background="Transparent" Click="Button_Click"></Button>
 
 
