@@ -134,6 +134,7 @@ public class ReserveController {
 		res = AuthToken.isOk(authResult);
 		if(res.isSuccess()) {
 			int resCode = reserveService.deleteReserve(reserve.getReserveId());
+			
 		}
 		return res;
 	}

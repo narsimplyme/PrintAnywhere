@@ -20,4 +20,6 @@
 			UPDATE client SET client_last_seen = now() WHERE (client_id = #{clientId})
 		]]>
 	</update>
+	
+	
 </mapper>

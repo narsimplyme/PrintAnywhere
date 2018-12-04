@@ -13,16 +13,16 @@
 		insert into reserve (user_id, file_id, client_id, reserve_time) 
 		values ( #{userId}, #{fileId}, #{clientId}, #{reserveTime})
 	</insert>
-	
+		
 	<select id="selectReserveList" parameterType="string" resultMap="reserveResult">
 		<![CDATA[
 			SELECT * FROM reserve WHERE user_id = #{userId} AND reserve_time >= now()
 		]]>
 	</select>
 	
-	<select id="selectReserveList" parameterType="string" resultMap="reserveResult">
+	<select id="reserveFileForClient" parameterType="int" resultMap="reserveResult">
 		<![CDATA[
-			SELECT * FROM reserve WHERE client_id = #{clientId} AND reserve_time >= now()
+			SELECT * FROM reserve WHERE client_id = #{clientId} AND reserve_time <= (SELECT DATE_ADD(now(), interval 1 MINUTE))
 		]]>
 	</select>
 	

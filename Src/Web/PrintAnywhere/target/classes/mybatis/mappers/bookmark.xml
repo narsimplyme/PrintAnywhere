@@ -12,14 +12,10 @@
 	</insert>
 	
 	<select id="selectBookMarkList" parameterType="string" resultMap="bookmarkResult">
-		select * from bookmark
+		select * from bookmark WHERE user_id = #{userId}
 	</select>
 	
-<<<<<<< HEAD
 	<delete id="deleteBookMark" parameterType="bookmark">
-=======
-	<delete id="deleteBookMark">
->>>>>>> ba9cd5635bae20740ec2d1cfe5536e597cd05db2
 		DELETE FROM bookmark WHERE user_id = #{userId} and client_id = #{clientId}
 	</delete>
 </mapper>

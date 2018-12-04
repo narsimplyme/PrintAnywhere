@@ -2,6 +2,8 @@ package com.capstone.model;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,8 @@ import com.capstone.util.Constants;
 
 @Repository
 public class BookMarkDao {
-
+	@Autowired
+	private DataSource dataSource;
 	private SqlSession sqlSession;
 	
 	@Autowired
@@ -39,6 +42,7 @@ public class BookMarkDao {
 			List<BookMark> list = sqlSession.selectList("bookmark.selectBookMarkList", userId);
 			return list;
 		} catch (PersistenceException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

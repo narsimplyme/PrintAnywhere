@@ -36,7 +36,7 @@ public class PrintLogController {
 		this.printLogService = printLogService;
 	}
 	
-	@RequestMapping(value = "insertPrintLog.do",  method = RequestMethod.GET)
+	@RequestMapping(value = "insertPrintLog.do",  method = RequestMethod.POST)
 	@ResponseBody
 	public Response insertPrintLog(HttpServletRequest request, @RequestBody PrintLog printLog) {
 		res = new Response();

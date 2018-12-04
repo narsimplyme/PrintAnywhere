@@ -199,6 +199,7 @@ public class UserController {
 			if(user != null) {
 				res.setSuccess(true);
 				res.setMessage(Constants.MSG_CODE_200);
+				user.setUserPw("");
 				data.put("user", user);
 				res.setData(data);
 				//res.setData(user);

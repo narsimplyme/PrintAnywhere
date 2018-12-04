@@ -81,7 +81,7 @@ public class FileController {
 				res.setSuccess(true);
 				res.setMessage(Constants.MSG_CODE_200);
 				FileUtil fileUtil = new FileUtil();
-				fileUtil.deleteFile(request, tempFile);
+				fileUtil.deleteFile(tempFile);
 			}else {
 				res.setSuccess(false);
 				if(resCode == Constants.DB_RES_CODE_9) {
@@ -111,7 +111,7 @@ public class FileController {
 			if(res.isSuccess()) {
 				for (int i = 0; i < fileList.size(); i++) {
 					FileUtil uf = new FileUtil();
-					File file = uf.uploadFile(session, request, fileList.get(i));
+					File file = uf.uploadFile(request, fileList.get(i));
 					if(file == null) {
 						res.setSuccess(false);
 						res.setMessage(Constants.MSG_CODE_111);
@@ -185,7 +185,7 @@ public class FileController {
 			if(authResult != null) {*/
 				for (int i = 0; i < fileList.size(); i++) {
 					FileUtil uf = new FileUtil();
-					File file = uf.uploadFile(session, request, fileList.get(i));
+					File file = uf.uploadFile(request, fileList.get(i));
 					if(file == null) {
 						res.setSuccess(false);
 						res.setMessage(Constants.MSG_CODE_306);

@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public class FileUtil {
 	
-	public com.capstone.dto.File uploadFile(HttpSession session, MultipartHttpServletRequest request, MultipartFile uploadFile) {
+	public com.capstone.dto.File uploadFile(MultipartHttpServletRequest request, MultipartFile uploadFile) {
 		com.capstone.dto.File f;
 		String path = "";
         String fileName = "";
@@ -31,7 +31,7 @@ public class FileUtil {
         +" / "+"getSize: "+uploadFile.getSize()+"hashFileName: "+hashFileName+"??"+expender);
         fileName = "";
         try {
-            String filePath = getSaveLocation(request)+hashFileName;
+            String filePath = Constants.SERVER_LOCAL_PATH+hashFileName;
 			File file = new File(filePath);  
             out = new FileOutputStream(file);  
             byte[] bytes = uploadFile.getBytes();
@@ -59,8 +59,8 @@ public class FileUtil {
 		return f;
 	}
 	
-	public int deleteFile(HttpServletRequest request, com.capstone.dto.File f) {
-        String filePath = getSaveLocationDelete(request) + f.getFileHash();
+	public int deleteFile(com.capstone.dto.File f) {
+        String filePath = Constants.SERVER_LOCAL_PATH + f.getFileHash();
         System.out.println(filePath);
 		File file = new File(filePath); 
 		if( file.exists() ){ 
@@ -76,7 +76,7 @@ public class FileUtil {
 		return 0;	
 	}
 	
-	private String getSaveLocation(MultipartHttpServletRequest request) {
+	/*private String getSaveLocation(MultipartHttpServletRequest request) {
         String uploadPath = request.getSession().getServletContext().getRealPath("/");
         String attachPath = "resources/file/";        
         return uploadPath + attachPath;
@@ -86,5 +86,5 @@ public class FileUtil {
         String uploadPath = request.getSession().getServletContext().getRealPath("/");
         String attachPath = "resources/file/";        
         return uploadPath + attachPath;
-	}
+	}*/
 }

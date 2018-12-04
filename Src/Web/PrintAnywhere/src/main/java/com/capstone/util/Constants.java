@@ -79,6 +79,8 @@ public class Constants {
 	
 	/**가까운 클라이언트 출력 갯수*/
 	public final static int NEAR_CLIENT_CNT = 5;
-	
-	public final static String SERVER_FILE_PATH = "http://printaw.com/resources/file/";
+	/**서버 download 경로*/
+	public final static String SERVER_FILE_PATH = "http://xdkyu02.cafe24.com/resources/file/";
+	/**서버 upload 경로*/
+	public final static String SERVER_LOCAL_PATH = "/xdkyu02/tomcat/webapps/ROOT/resources/file/";
 }
