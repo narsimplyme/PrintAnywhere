@@ -15,12 +15,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Input;
+using RawPrint;
+using System.Drawing.Printing;
 
 namespace PrintAnywhere
 {
     public class MainWindowViewModel
     {
-        public ObservableCollection<FileList> Items { get; private set; }
+        public ObservableCollection<TypesetFileList> Items { get; private set; }
         public ObservableCollection<User> _userObservable { get; private set; }
         public ICommand _Print { get; private set; }
         public ICommand _RefreshFileList { get; private set; }
@@ -58,7 +60,7 @@ namespace PrintAnywhere
         public MainWindowViewModel(Action closeAction, string _jwt)
         {
             this._closeAction = closeAction;
-            Items = new ObservableCollection<FileList>();
+            Items = new ObservableCollection<TypesetFileList>();
             _userObservable = new ObservableCollection<User>();
 
             this._jwt = _jwt;
@@ -146,9 +148,28 @@ namespace PrintAnywhere
 
                         foreach (FileList item in _filelist)
                         {
+                            Console.WriteLine(item.fileType);
+                            TypesetFileList tsFL = new TypesetFileList();
+
+                            tsFL.fileId = item.fileId;
+                            tsFL.fileHash = item.fileHash;
+                            tsFL.fileName = item.fileName;
+
+
+                            if (item.fileType == 0) { tsFL.fileType = "PDF"; }
+                            else if (item.fileType == 1) { tsFL.fileType = "DOCX"; }
+                            else if (item.fileType == 2) { tsFL.fileType = "DOCX"; }
+                            else if (item.fileType == 3) tsFL.fileType = "PPT";
+                            else tsFL.fileType = "ETC";
+
+
+                            tsFL.fileDate = item.fileDate;
+                            tsFL.fileSize = item.fileSize;
+
                             App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                             {
-                                Items.Add(item);
+                                
+                                Items.Add(tsFL);
                                 userName = _user.userName;
                                 userPoint = _user.userPoint;
                             });
@@ -188,7 +209,7 @@ namespace PrintAnywhere
             if (items != null)
             {
                 StringWriter writer = new StringWriter();
-                foreach (FileList item in items)
+                foreach (TypesetFileList item in items)
                 {
                     Task.Run(async () =>
                     {
@@ -212,8 +233,20 @@ namespace PrintAnywhere
                                 var fileUrl = jsonParse.data.fileUrl;
                                 using (var webclient = new WebClient())
                                 {
-                                    webclient.DownloadFile(fileUrl, "C:\\temp\\" + item.fileId + ".pdf");
-                                    bool succ = Pdf.PrintPDFs("C:\\temp\\" + item.fileId + ".pdf");
+                                    Console.WriteLine(item.fileType);
+                                    webclient.DownloadFile(fileUrl, "C:\\temp\\" + item.fileId + item.fileType);
+
+
+                                    bool succ = false;
+                                    if (item.fileType == "pdf") succ = Pdf.PrintPDFs("C:\\temp\\" + item.fileId + ".pdf");
+                                    else {
+                                        IPrinter printer = new Printer();
+                                        PrinterSettings settings = new PrinterSettings();
+                                        var PrinterName = settings.PrinterName;
+                                        Console.WriteLine(PrinterName);
+                                        printer.PrintRawFile(PrinterName, "C:\\temp\\", item.fileId + "."+ item.fileType);
+                                        succ = true;
+                                    }
                                     if (succ)
                                     {
 

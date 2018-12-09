@@ -24,4 +24,14 @@ namespace PrintAnywhere.Models
         public int endFilePoint { get; set; }
 
     }
+    public class TypesetFileList
+    {
+        public int fileId { get; set; }
+        public string fileHash { get; set; }
+        public string fileName { get; set; }
+        public string fileType { get; set; }
+        public string fileDate { get; set; }
+        public string fileSize { get; set; }
+
+    }
 }
